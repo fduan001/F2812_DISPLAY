@@ -266,7 +266,7 @@ far cmd_tbl_t rs422_cmd[] =
 	},
 };
 
-int rs422_cmd_init(void)
+int RS422CmdInit(void)
 {
     s8 index;
     for (index = 0; index < sizeof(rs422_cmd) / sizeof(cmd_tbl_t); index++)

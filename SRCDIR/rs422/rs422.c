@@ -17,21 +17,15 @@ typedef int BOOL;
 #endif
 
 #define RX_LEN   256
-#define RS422_NUM    5
+#define RS422_NUM    2
 
 #define   RS422_CHIP1_RESET_BIT   4
 #define   RS422_CHIP2_RESET_BIT   5
-#define   RS422_CHIP3_RESET_BIT   6
-#define   RS422_CHIP4_RESET_BIT   7
-#define   RS422_CHIP5_RESET_BIT   8
+
 
 #define  RS422_CHIP1_INT_BIT      0
-#define  RS422_CHIP2_INT_BIT      0
-#define  RS422_CHIP3_INT_BIT      0
-#define  RS422_CHIP4_INT_BIT      0
-#define  RS422_CHIP5_INT_BIT      0
+#define  RS422_CHIP2_INT_BIT      1
 
-#define   RS422_IRQNO    GPIO_IRQ1
 #define   RS422_BASE_ADDR    (0x8000 + 0x60)
 
 #define UART_REG(reg, pchan) \
@@ -59,17 +53,11 @@ UART_BUFF  altera_uart_buff[RS422_NUM];
 unsigned char UART_RESET_BIT[RS422_NUM]={
     RS422_CHIP1_RESET_BIT,
     RS422_CHIP2_RESET_BIT,
-    RS422_CHIP3_RESET_BIT,
-    RS422_CHIP4_RESET_BIT,
-    RS422_CHIP5_RESET_BIT
 };
 
 unsigned char UART_INT_BIT[RS422_NUM]={
     RS422_CHIP1_INT_BIT,
     RS422_CHIP2_INT_BIT,
-    RS422_CHIP3_INT_BIT,
-    RS422_CHIP4_INT_BIT,
-    RS422_CHIP5_INT_BIT
 };
 
 void uartReset(unsigned char chipNo);
@@ -141,7 +129,7 @@ void RS422Isr(UINT8 bit_pos)
 int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit,unsigned int baud)
 {
     int ret = OK;
-    int irqnum = 0;
+    int irqnum = UART_INT_BIT[chipNo];
 
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
@@ -153,11 +141,11 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
 
     RS422Init(chipNo);
 
-    if(RS422SetOpt(chipNo,party,stop,data_bit) != OK)
+    if(RS422SetOpt(chipNo, party, stop, data_bit) != OK)
         return(ERROR);
 
 
-    if(RS422SetBaud(chipNo,baud) != OK)
+    if(RS422SetBaud(chipNo, baud) != OK)
         return(ERROR);
 
     pdevFd->rx_semSync = Osal_SemCreateBinary(0);
