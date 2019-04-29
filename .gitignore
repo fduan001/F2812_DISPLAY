@@ -1,0 +1,10 @@
+Debug
+Release
+src
+.ccsproject
+.cproject
+.project
+.xdchelp
+.config
+.launches
+.settings
