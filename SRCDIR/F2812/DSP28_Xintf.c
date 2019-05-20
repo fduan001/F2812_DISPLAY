@@ -40,7 +40,9 @@ void InitXintf(void)
     // Timing for all zones based on XTIMCLK = SYSCLKOUT=150M to get high speed
     //XintfRegs.XINTCNF2.bit.XTIMCLK = 0x0;
     //sysclkout/2
-    XintfRegs.XINTCNF2.bit.XTIMCLK = 0x1; 
+   // XintfRegs.XINTCNF2.bit.XTIMCLK = 0x1;
+	//150MHZ
+	XintfRegs.XINTCNF2.bit.XTIMCLK = 0x0;
 	//XCLKOUT=XTIMCLK
 	XintfRegs.XINTCNF2.bit.CLKMODE = 0x0;
     //CLKOUT is enable
@@ -51,38 +53,64 @@ void InitXintf(void)
     // When using ready, ACTIVE must be 1 or greater
     // Lead must always be 1 or greater
     // Use timings based on SYSCLKOUT = XTIMCLK
-    XintfRegs.XTIMING0.bit.XWRTRAIL = 1;
-    XintfRegs.XTIMING0.bit.XWRACTIVE = 1;
-    XintfRegs.XTIMING0.bit.XWRLEAD = 1;
+#if 0
+    XintfRegs.XTIMING0.bit.XWRTRAIL = 2;
+    XintfRegs.XTIMING0.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING0.bit.XWRLEAD = 2;
     XintfRegs.XTIMING0.bit.XRDTRAIL = 2;
-    XintfRegs.XTIMING0.bit.XRDACTIVE = 2;
+    XintfRegs.XTIMING0.bit.XRDACTIVE = 4;
     XintfRegs.XTIMING0.bit.XRDLEAD = 2;
     // Do not double lead/active/trail for Zone 0
     XintfRegs.XTIMING0.bit.X2TIMING = 0;
     XintfRegs.XTIMING0.bit.USEREADY = 0;	
 
     //zone1 
-    XintfRegs.XTIMING1.bit.XWRTRAIL = 1;
-    XintfRegs.XTIMING1.bit.XWRACTIVE = 1;
-    XintfRegs.XTIMING1.bit.XWRLEAD = 1;
+    XintfRegs.XTIMING1.bit.XWRTRAIL = 2;
+    XintfRegs.XTIMING1.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING1.bit.XWRLEAD = 2;
     XintfRegs.XTIMING1.bit.XRDTRAIL = 2;
-    XintfRegs.XTIMING1.bit.XRDACTIVE = 2;
+    XintfRegs.XTIMING1.bit.XRDACTIVE = 4;
     XintfRegs.XTIMING1.bit.XRDLEAD = 2;
     // Do not double lead/active/trail for Zone 1
     XintfRegs.XTIMING1.bit.X2TIMING = 0;
     XintfRegs.XTIMING1.bit.USEREADY = 0;	
 
+#endif
+    //SRAM for cs0&1
+#if 1
+    XintfRegs.XTIMING0.bit.XWRTRAIL = 2;
+    XintfRegs.XTIMING0.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING0.bit.XWRLEAD = 2;
+    XintfRegs.XTIMING0.bit.XRDTRAIL = 2;
+    XintfRegs.XTIMING0.bit.XRDACTIVE = 4;
+    XintfRegs.XTIMING0.bit.XRDLEAD = 2;
+    // Do not double lead/active/trail for Zone 0
+    XintfRegs.XTIMING0.bit.X2TIMING = 0;
+    XintfRegs.XTIMING0.bit.USEREADY = 0;
+
+    //zone1
+    XintfRegs.XTIMING1.bit.XWRTRAIL = 2;
+    XintfRegs.XTIMING1.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING1.bit.XWRLEAD = 2;
+    XintfRegs.XTIMING1.bit.XRDTRAIL = 2;
+    XintfRegs.XTIMING1.bit.XRDACTIVE = 4;
+    XintfRegs.XTIMING1.bit.XRDLEAD = 2;
+    // Do not double lead/active/trail for Zone 1
+    XintfRegs.XTIMING1.bit.X2TIMING = 0;
+    XintfRegs.XTIMING1.bit.USEREADY = 0;
+
+#endif
 
     // Zone 2  for Host Dual port SRAM  
     // Ignore XREADY for Zone 2 accesses
     // Change read access lead/active/trail timing
     XintfRegs.XTIMING2.bit.USEREADY = 0;
-    XintfRegs.XTIMING2.bit.XRDLEAD = 1;
-    XintfRegs.XTIMING2.bit.XRDACTIVE = 2;
-    XintfRegs.XTIMING2.bit.XRDTRAIL = 1;
-    XintfRegs.XTIMING2.bit.XWRLEAD = 1;
-    XintfRegs.XTIMING2.bit.XWRACTIVE = 1;
-    XintfRegs.XTIMING2.bit.XWRTRAIL = 1;
+    XintfRegs.XTIMING2.bit.XRDLEAD = 2;
+    XintfRegs.XTIMING2.bit.XRDACTIVE = 4;
+    XintfRegs.XTIMING2.bit.XRDTRAIL = 2;
+    XintfRegs.XTIMING2.bit.XWRLEAD = 2;
+    XintfRegs.XTIMING2.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING2.bit.XWRTRAIL = 2;
 
     //  Do not double lead/active/trail for Zone 1
     XintfRegs.XTIMING2.bit.X2TIMING = 0;
@@ -93,15 +121,15 @@ void InitXintf(void)
     // Ignore XREADY for Zone 6 accesses
     // Change read access lead/active/trail timing
     XintfRegs.XTIMING6.bit.USEREADY = 0;
-    XintfRegs.XTIMING6.bit.XRDLEAD = 3;
-    XintfRegs.XTIMING6.bit.XRDACTIVE = 7;
-    XintfRegs.XTIMING6.bit.XRDTRAIL = 3;
-    XintfRegs.XTIMING6.bit.XWRLEAD = 1;
-    XintfRegs.XTIMING6.bit.XWRACTIVE =6;
-    XintfRegs.XTIMING6.bit.XWRTRAIL = 3;
+    XintfRegs.XTIMING6.bit.XRDLEAD = 2;
+    XintfRegs.XTIMING6.bit.XRDACTIVE = 5;
+    XintfRegs.XTIMING6.bit.XRDTRAIL = 2;
+    XintfRegs.XTIMING6.bit.XWRLEAD = 2;
+    XintfRegs.XTIMING6.bit.XWRACTIVE = 3;
+    XintfRegs.XTIMING6.bit.XWRTRAIL = 2;
 
     //  Do not double lead/active/trail for Zone 1
-    XintfRegs.XTIMING6.bit.X2TIMING = 1;
+    XintfRegs.XTIMING6.bit.X2TIMING = 0;
     XintfRegs.XTIMING6.bit.USEREADY = 0;
     XintfRegs.XTIMING6.bit.XSIZE = 3;
     XintfRegs.XTIMING6.bit.READYMODE = 0;

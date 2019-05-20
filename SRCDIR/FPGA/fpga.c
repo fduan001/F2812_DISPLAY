@@ -171,3 +171,47 @@ void XINT_Isr1(void) {
 void XINT_Isr2(void) {
     // used for master/slave role switch
 }
+
+/* delay for some us timeout = 1000, 1ms delay */
+void SysUDelay(int timeout) {
+    if( timeout > 50000 || timeout <=0 ) { /* only allow 50 ms delay max for this interface */
+        return ;
+    }
+
+    /* clear udelay register */
+    FPGA_REG16_W(FPGA_UDELAY_CTRL_REG, 0x0);
+    // FPGA_REG16_W(FPGA_UDELAY_COUNT_REG, 0x0);
+
+    FPGA_REG16_W(FPGA_UDELAY_CTRL_REG, 0x3);
+    while(1) {
+        if( FPGA_REG16_R(FPGA_UDELAY_COUNT_REG) >= timeout ) {
+            return;
+        }
+    }
+
+    FPGA_REG16_W(FPGA_UDELAY_CTRL_REG, 0x0);
+    return;
+}
+
+/* delay for some us, 1000ms = 1 seconds */
+void SysMDelay(int timeout) {
+
+
+    int i = 0;
+    int loop = timeout / 50;
+    int rem = timeout % 50;
+
+    if( timeout > 50000 || timeout <=0 ) { /* only allow 50 seconds delay max for this interface */
+        return ;
+    }
+    for( i = 0; i < loop; ++i ) {
+        SysUDelay(50000); /* sleep 50 ms for each loop */
+    }
+
+    SysUDelay(rem);
+
+    return;
+}
+
+
+

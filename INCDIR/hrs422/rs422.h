@@ -73,5 +73,9 @@ int RS422Init(unsigned char chipNo);
 int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned char data_bit);
 int RS422SetBaud(unsigned char chipNo,unsigned int baud);
 
+int HostUartInit(void);
+int HostUartSend(UINT8* buffer, UINT16 length);
+int HostUartRecv(UINT8* buffer, UINT16 length);
+
 #endif
 

@@ -272,11 +272,12 @@ void UartPrintf(const char *fmt, ...)
 }
 #endif
 
-
-
-
-INT16  UartCharGetTimeout(UINT16 timeout)
+UINT8  UartCharGetTimeout(UINT16 timeout, int *result)
 {
+    if( result ) {
+        *result = 0;
+    }
+
     UINT32 timebase = GetTimer2Cnt();
     while((GetTimer2Cnt() - timebase) <= timeout)
     {
@@ -287,7 +288,59 @@ INT16  UartCharGetTimeout(UINT16 timeout)
         }
     }
 
+    if( result ) {
+        *result = -1;
+    }
     return -1;
+}
+
+UINT8 UartCharGetTimeout_B(UINT16 timeout, int *result)
+{
+    if( result ) {
+        *result = 0;
+    }
+
+    UINT32 timebase = GetTimer2Cnt();
+    while((GetTimer2Cnt() - timebase) <= timeout)
+    {
+        if(1 == SciaRx_Ready())
+        {
+            return (unsigned char)(SciaRegs.SCIRXBUF.all);
+
+        }
+    }
+
+    if( result ) {
+        *result = -1;
+    }
+    return 0xFF;
+}
+
+int UartWrite_B(UINT8 *buffer, UINT16 length) {
+    int rt = 0;
+    UINT16 i = 0;
+    for( i = 0; i < length; ++i ) {
+        UartCharPut_B(buffer[i]);
+    }
+    return length;
+}
+
+#define GETCHAR_TIMEOUT      5000 /* 5ms */
+
+int UartRead_B(UINT8* buffer, UINT16 length) {
+    int rt = -1;
+    int result = -1;
+    int i = 0;
+    UINT8 val = 0;
+    for( i = 0; i < length; ++i ) {
+        val = UartCharGetTimeout_B(GETCHAR_TIMEOUT, &result);
+        if( result != 0 ) {
+            break;
+        }
+        buffer[i] = val;
+    }
+
+    return i;
 }
 
 //===========================================================================

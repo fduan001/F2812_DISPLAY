@@ -19,7 +19,10 @@
 
 /* IO control */
 #define FPGA_IO_STATUS_REG                              (FPGA_BASE_ADDR + 0xA)
-#define FPGA_IO_SELF_TEST_REG                           (FPGA_BASE_ADDR + 0xB)
+
+/* UDELAY */
+#define FPGA_UDELAY_CTRL_REG                            (FPGA_BASE_ADDR + 0xB)
+#define FPGA_UDELAY_COUNT_REG                           (FPGA_BASE_ADDR + 0xC)
 
 /* RS422 */
 #define FPGA_RS422_TRX1_RX_REG                               (FPGA_BASE_ADDR + 0x60)

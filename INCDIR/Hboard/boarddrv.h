@@ -62,9 +62,12 @@ INT16 SciaRx_Ready(void);
 INT16 SciaTx_Ready(void);
 void UartPrintf(const char *fmt, ...);
 UINT8 UartGetc(void);
-INT16  UartCharGetTimeout(UINT16 timeout);
+UINT8  UartCharGetTimeout(UINT16 timeout, int *result);
 void UartPutbuffer(UINT8 *s);
 
+UINT8 UartCharGetTimeout_B(UINT16 timeout, int *result);
+int UartWrite_B(UINT8 *buffer, UINT16 length);
+int UartRead_B(UINT8* buffer, UINT16 length);
 
 //spi
 void SpiWriteData(UINT16 data);

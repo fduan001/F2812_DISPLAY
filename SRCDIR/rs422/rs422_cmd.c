@@ -26,11 +26,13 @@ static int do_rs422_init(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const arg
 	unsigned char data_bit;
 	unsigned int baud;
 
+#if 0
 	if (argc != 6)
 	{
 		PRINTF("argc=%d\n", argc);
 		return cmd_usage(cmdtp);
 	}
+#endif
 
 	chip = simple_strtoul(argv[1], NULL, 10);
 	party = simple_strtoul(argv[2], NULL, 10);
@@ -38,26 +40,32 @@ static int do_rs422_init(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const arg
 	data_bit = simple_strtoul(argv[4], NULL, 10);
 	baud = simple_strtoul(argv[5], NULL, 10);
 
-	rc = RS422Open(chip, party, stop, data_bit, baud);
-	if( rc != 0 ) {
-		PRINTF("RS422Open failed, rc=%d\n", rc);
-		return CMD_RET_FAILURE;
+	if( chip == 0 ) {
+		rc = HostUartInit();
 	}
 
+	if( chip == 1 ) {
+		rc = RS422Open(chip, party, stop, data_bit, baud);
+		if( rc != 0 ) {
+			PRINTF("RS422Open failed, rc=%d\n", rc);
+			return CMD_RET_FAILURE;
+		}
+		PRINTF("chip=%u party=%c stop=%u data_bit=%u baud=%u\n", chip, party, stop, data_bit, baud);
+	}
+
+	
 	return CMD_RET_SUCCESS;
 }
 
 static int do_rs422_show(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv[])
 {
 	unsigned char chip;
-
-	if (argc != 2)
-	{
-		PRINTF("argc=%d\n", argc);
-		return cmd_usage(cmdtp);
-	}
-
 	chip = simple_strtoul(argv[1], NULL, 10);
+
+	if( chip != 1 ) {
+		PRINTF("chip %u is invalid\n", chip);
+		return CMD_RET_FAILURE;
+	}
 	DebugUartRegInfo(chip);
 
 	return CMD_RET_SUCCESS;
@@ -71,12 +79,6 @@ static int do_rs422_read(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	char buff[100];
 	int i = 0;
 
-	if (argc != 3)
-	{
-		PRINTF("argc=%d\n", argc);
-		return cmd_usage(cmdtp);
-	}
-
 	chip = simple_strtoul(argv[1], NULL, 10);
 	bytes = simple_strtoul(argv[2], NULL, 10);
 
@@ -84,7 +86,15 @@ static int do_rs422_read(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 		PRINTF("bytes out of range\n");
 		return CMD_RET_FAILURE;
 	}
-	rc = RS422Read(chip, buff, bytes);
+
+	if( chip == 0 ) {
+		rc = HostUartRecv(buff, bytes);
+	}
+
+	if( chip == 1 ) {
+		rc = RS422Read(chip, buff, bytes);
+	}
+
 	if( rc != 0 ) {
 		PRINTF("RS422Read failed\n");
 		return CMD_RET_FAILURE;
@@ -107,23 +117,23 @@ static int do_rs422_write(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const ar
 	unsigned int bytes;
 	unsigned int source;
 
-	if (argc != 4)
-	{
-		PRINTF("argc=%d\n", argc);
-		return cmd_usage(cmdtp);
-	}
-
 	chip = simple_strtoul(argv[1], NULL, 10);
 	source = simple_strtoul(argv[2], NULL, 16);
 	bytes = simple_strtoul(argv[3], NULL, 10);
 
-	rc = RS422Write(chip, (char*)source, bytes);
+	if( chip == 0 ) {
+		rc = HostUartSend((char*)source, bytes);
+	}
+
+	if( chip == 1 ) {
+		rc = RS422Write(chip, (char*)source, bytes);
+	}
 	if( rc != 0 ) {
 		PRINTF("RS422Write failed\n");
 		return CMD_RET_FAILURE;
 	}
 
-	PRINTF("rs422 WRITE COMPLETE\n");
+	PRINTF("rs422 %u WRITE COMPLETE\n", chip);
 	return CMD_RET_SUCCESS;
 }
 
@@ -137,17 +147,13 @@ static int do_rs422_test(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	int index = 0;
 	int  activeNo = 0;
 
-	if (argc != 1)
-	{
-		PRINTF("argc=%d\n", argc);
-		return cmd_usage(cmdtp);
-	}
-
+#if 0
 	rc = RS422Open(0, 'e', 1, 8, 19200);
 	if( rc != 0 ) {
 		PRINTF("RS422Open failed, rc=%d\n", rc);
 		return CMD_RET_FAILURE;
 	}
+#endif
 
 	rc = RS422Open(1, 'e', 1, 8, 19200);
 	if( rc != 0 ) {
@@ -168,7 +174,7 @@ static int do_rs422_test(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	    // for(index = 0;index <= 0x100;index++)
 	     {
 	     PRINTF("send index = %d\r\n",index); 	 
-	     RS422Write(0,  (char*)cbuf,  UT_LEN);
+	     HostUartSend((char*)cbuf,  UT_LEN);
 	     Osal_TaskSleep(1000);
 	     } 
 	     activeNo = 1;
@@ -197,9 +203,9 @@ static int do_rs422_test(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	    	 }
 	    	 else
 	    	 {
-	    		 if(RS422Read(0, (char*)cbuf, UT_LEN) == UT_LEN)
+	    		 if(HostUartRecv((char*)cbuf, UT_LEN) == UT_LEN)
 		    	 {
-		    		 PRINTF("----Chip1 Recv RS422 Frame -----\r\n");
+		    		 PRINTF("----Chip0 Recv RS422 Frame -----\r\n");
 	    		 
 		    	     for(i = 0;i < UT_LEN;i++)
 		    	     {
@@ -207,8 +213,8 @@ static int do_rs422_test(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 		    	    	 cbuf[i]++;
 		    	     }
 		    	     
-		    	     RS422Write(0, (char*)cbuf, UT_LEN);
-		    	     PRINTF("----Send RS422 Frame on chip1-----\r\n");
+		    	     HostUartSend((char*)cbuf, UT_LEN);
+		    	     PRINTF("----Send RS422 Frame on chip0-----\r\n");
 		    	     activeNo = 1;
 		     		 
 		    	 } 		 
@@ -235,19 +241,23 @@ static int do_rs422(cmd_tbl_t * cmdtp, s32 flag, int argc, char * const argv[])
 {
 	cmd_tbl_t *c;
 
-	if (argc < 2) {
+	PRINTF("argc=%d\n", argc);
+#if 0
+	if (argc < 8) {
 
 		return CMD_RET_USAGE;
 	}
-
+#endif
 	/* Strip off leading 'i2c' command argument */
 	argc--;
 	argv++;
 
 	c = find_cmd_tbl(argv[0], &cmd_rs422_sub[0], ARRAY_SIZE(cmd_rs422_sub));
 
-	if (c)
+	if (c) {
+		PRINTF("go to cmd %s\n", argv[0]);
 		return c->cmd(cmdtp, flag, argc, argv);
+	}
 	else
 		return CMD_RET_USAGE;
 }
@@ -256,7 +266,7 @@ static int do_rs422(cmd_tbl_t * cmdtp, s32 flag, int argc, char * const argv[])
 far cmd_tbl_t rs422_cmd[] =
 {
 	{
-		"rs422", CONFIG_SYS_MAXARGS, 1,	do_rs422,
+		"rs422", 8, 1,	do_rs422,
 		"rs422 debug commands",
 		"rs422 init chip \n" \
 		"rs422 show chip \n" \

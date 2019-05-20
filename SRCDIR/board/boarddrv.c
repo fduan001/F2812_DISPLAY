@@ -76,6 +76,10 @@ void BoardInit()
     InitPieVectTable();
 #endif	
 
+
+    /* 初始化外设寄存器 */
+    InitPeripherals();
+    InitXint();
 #ifndef HOST_PC
     if(0 == UnlockCsm())
         UartPrintf("unlock csm for flash programing sucessfully \n");
@@ -85,10 +89,6 @@ void BoardInit()
     }
 #endif
     UartPrintf("register shell command \n");
-
-    /* 初始化外设寄存器 */
-    InitPeripherals();
-    InitXint();
 
     //I2cCmdInitialzie();
 	FpgaCmdInitialzie();
