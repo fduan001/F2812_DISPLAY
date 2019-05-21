@@ -38,6 +38,10 @@ void InitSci(void)
     regval = GpioMuxRegs.GPFMUX.all;
     regval |= SCI_PIN_MUX;
     GpioMuxRegs.GPFMUX.all = regval;
+
+    regval = GpioMuxRegs.GPGMUX.all;
+    regval |= SCI_PIN_MUX;
+    GpioMuxRegs.GPGMUX.all = regval;
     EDIS;
     SciaRegs.SCICTL1.all = 0x0;
     /*   8 bit data */
