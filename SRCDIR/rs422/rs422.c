@@ -438,7 +438,7 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
 {
     int index = 0;
     char * ptr = pBuf;
-    unsigned char data;
+    UINT8 data;
 
     if (pdevFd == NULL)
         return (ERROR);
@@ -452,7 +452,8 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
             PlatformDelay(1);
         }
 
-        data = (unsigned char)(*ptr);
+        data = (UINT8)(*ptr);
+        PRINTF("sent: %x\n", data);
         UART_REG(THR,pdevFd) = data;
         ptr++;
     }
