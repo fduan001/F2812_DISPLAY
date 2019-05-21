@@ -64,18 +64,18 @@
 #define  LSR_TRANS_EMTPY   0x40
 #define  LSR_RECV_FIFO_ERROR 0x80
 
-int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit, UINT32 baud);
-int RS422Close(unsigned char chipNo);
-int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes);
-int RS422Write(unsigned char chipNo,char * buf,unsigned int nBytes);
+INT32 RS422Open(UINT8 chipNo, INT8 party, UINT8 stop, UINT8 data_bit, UINT32 baud);
+INT32 RS422Close(UINT8 chipNo);
+INT32 RS422Read(UINT8 chipNo, INT8 * buf, UINT32 nBytes);
+INT32 RS422Write(UINT8 chipNo, INT8 * buf, UINT32 nBytes);
 
-int RS422Init(unsigned char chipNo);
-int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned char data_bit);
-int RS422SetBaud(unsigned char chipNo, UINT32 baud);
+INT32 RS422Init(UINT8 chipNo);
+INT32 RS422SetOpt(UINT8 chipNo, INT8 party,UINT8 stop_bit, UINT8 data_bit);
+INT32 RS422SetBaud(UINT8 chipNo, UINT32 baud);
 
-int HostUartInit(void);
-int HostUartSend(UINT8* buffer, UINT16 length);
-int HostUartRecv(UINT8* buffer, UINT16 length);
+INT32 HostUartInit(void);
+INT32 HostUartSend(UINT8* buffer, UINT16 length);
+INT32 HostUartRecv(UINT8* buffer, UINT16 length);
 
 #endif
 

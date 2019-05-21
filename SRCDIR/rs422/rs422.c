@@ -6,7 +6,9 @@
 #include "rs422.h"
 #include "fpga.h"
 
+#if 0
 #define RS422_USR_INTR_MODE   1
+#endif
 
 typedef int BOOL;
 
@@ -77,10 +79,13 @@ void RS422SysDataInit(void) {
 	memset(altera_uart_buff, 0, sizeof(altera_uart_buff));
 }
 
-void uartReset(unsigned char chipNo);
-int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
+void uartReset(UINT8 chipNo);
+INT32 uartTransBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes);
+
+#ifdef RS422_USR_INTR_MODE
 void uartRecvHandle(UART_BUFF * pDev);
-int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
+INT32 uartRecvBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes);
+#endif
 
 void DebugSysReg(void)
 {
@@ -98,7 +103,7 @@ void DebugUartReg(UART_BUFF *pdevFd)
     shellprintf("%08lx:LCR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(LCR,pdevFd));
 }
 
-void DebugUartRegInfo(unsigned char chipNo)
+void DebugUartRegInfo(UINT8 chipNo)
 {
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
@@ -110,7 +115,7 @@ void DebugUartRegInfo(unsigned char chipNo)
     DebugUartReg(pdevFd);
 }
 
-
+#ifdef RS422_USR_INTR_MODE
 void RS422Isr(void* data)
 {
     UART_BUFF *pdevFd = NULL;
@@ -141,9 +146,10 @@ void RS422Isr(void* data)
 
     return;
 }
+#endif
 
 
-int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit,UINT32 baud)
+INT32 RS422Open(UINT8 chipNo, INT8 party,UINT8 stop,UINT8 data_bit,UINT32 baud)
 {
     int ret = OK;
     int irqnum = UART_INT_BIT[chipNo];
@@ -210,9 +216,9 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
     return ret;
 }
 
-int RS422Close(unsigned char chipNo)
+INT32 RS422Close(UINT8 chipNo)
 {
-    int ret = OK;
+    INT32 ret = OK;
     int irq_num = 0;
 
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
@@ -248,9 +254,9 @@ int RS422Close(unsigned char chipNo)
     return ret;
 }
 
-int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes)
+INT32 RS422Read(UINT8 chipNo, INT8 * buf, UINT32 nBytes)
 {
-    unsigned int readNum = 0;
+    UINT32 readNum = 0;
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
     if(chipNo >= RS422_NUM)
@@ -264,7 +270,7 @@ int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes)
     {	
         return(ERROR);
     }
-#endif
+
 
     while(((pdevFd->msgrd)!=(pdevFd->msgwr)) && (readNum < nBytes))
     {	
@@ -280,13 +286,16 @@ int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes)
     {
         Osal_SemPost(pdevFd->rx_semSync);
     }
+#else
+    readNum = uartPollRead(pdevFd, buf, nBytes);
+#endif
 
     // PRINTF("chipNo = %d,read data,len = %d\r\n",chipNo,readNum); 
 
     return readNum;
 }
 
-int RS422Write(unsigned char chipNo,char * buf,unsigned int nBytes)
+INT32 RS422Write(UINT8 chipNo, INT8 * buf, UINT32 nBytes)
 {
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
@@ -303,7 +312,7 @@ int RS422Write(unsigned char chipNo,char * buf,unsigned int nBytes)
     return nBytes;   
 }
 
-int RS422Init(unsigned char chipNo)
+INT32 RS422Init(UINT8 chipNo)
 {
     int ret = OK;
 
@@ -327,10 +336,10 @@ int RS422Init(unsigned char chipNo)
     return ret;
 }
 
-int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned char data_bit)
+INT32 RS422SetOpt(UINT8 chipNo, INT8 party,UINT8 stop_bit, UINT8 data_bit)
 {
     int ret = OK;
-    unsigned char lcr;
+    UINT8 lcr;
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
     lcr = 0;
@@ -363,7 +372,7 @@ int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned 
     return ret;
 }
 
-int RS422SetBaud(UINT8 chipNo,UINT32 baud)
+INT32 RS422SetBaud(UINT8 chipNo,UINT32 baud)
 {
     int ret = OK;
     UINT16 dll,dlh;
@@ -391,7 +400,7 @@ int RS422SetBaud(UINT8 chipNo,UINT32 baud)
 }
 
 
-int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
+INT32 uartRecvBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes)
 {
     int index = 0;
     char * ptr = pBuf;
@@ -435,6 +444,7 @@ int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
     return index;
 }
 
+#ifdef RS422_USR_INTR_MODE
 void uartRecvHandle(UART_BUFF * pDev)
 {
     UART_BUFF *pdevFd = (UART_BUFF *)pDev;
@@ -448,15 +458,42 @@ void uartRecvHandle(UART_BUFF * pDev)
 
         if(uartRecvBytes(pdevFd, (char*)&buf[0],  sizeof(buf[0])) != 0)
         {
-#ifdef RS422_USR_INTR_MODE
+
             Osal_SemPost(pdevFd->rx_semSync);
-#endif
         }
     }
     return;
 }
+#else
+INT32 uartPollRead(UART_BUFF * pDev, INT8 *pBuf, INT32 nBytes) {
+	UINT32 count = 0;
+	UINT32 maxCount = 2000; /* 2ms per char */
+	INT32 i = 0;
+	UINT16 data = 0;
+	UART_BUFF *pdevFd = (UART_BUFF *)pDev;
 
-int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
+	for( i = 0; i < nBytes; ++i ) {
+		count = 0;
+		while(1) {
+			if((UART_REG(LSR, pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID) {
+				data = (UINT16)UART_REG(RBR, pdevFd);
+				pBuf[i] = (data >> 0) & 0xff;
+			} else {
+				++count;
+				if( count > maxCount ) {
+					return i;
+				}
+				PlatformDelay(1); /* delay 1us then check */
+			}
+		}
+	}
+	return i;
+}
+#endif
+
+
+
+INT32 uartTransBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes)
 {
     int index = 0;
     UINT32 count = 0;
@@ -489,7 +526,7 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
     return nBytes;
 }
 
-void uartReset(unsigned char chipNo)
+void uartReset(UINT8 chipNo)
 {
 
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
