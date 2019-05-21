@@ -8,7 +8,7 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 #include "config.h"
-#include "shellctype.h"
+#include "F2812_datatype.h"
 
 #define CMD_FLAG_REPEAT		0x0001	/* repeat last command		*/
 #define CMD_FLAG_BOOTD		0x0002	/* command is from bootd	*/

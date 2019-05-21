@@ -137,7 +137,7 @@ INT32 print_buffer (UINT32 addr, void *data, UINT32 width, UINT32 count, UINT32 
    //         shellprintf(" %0*x", width * 2, x);
 
             //data += width;
-            ((UINT32)data) += 1;
+            data += 1;
             //  for c6000 compiler
             //	data= (void*)((UINT32)data+width);
         }

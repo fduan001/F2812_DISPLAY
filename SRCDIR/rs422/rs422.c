@@ -19,8 +19,8 @@ typedef int BOOL;
 #define RX_LEN   256
 #define RS422_NUM    2
 
-#define   RS422_CHIP1_RESET_BIT   4
-#define   RS422_CHIP2_RESET_BIT   5
+#define   RS422_CHIP1_RESET_BIT   0
+#define   RS422_CHIP2_RESET_BIT   1
 
 
 #define  RS422_CHIP1_INT_BIT      0
@@ -368,8 +368,6 @@ int RS422SetBaud(unsigned char chipNo,unsigned int baud)
 }
 
 
-
-
 int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
 {
     int index = 0;
@@ -474,4 +472,5 @@ void uartReset(unsigned char chipNo)
     PlatformDelay(10);   
     return;
 }
+
 

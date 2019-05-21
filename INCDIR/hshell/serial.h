@@ -9,7 +9,8 @@
 #define SERIAL_H_
 
 #include <stdio.h>
-#include "shellctype.h"
+#include "F2812_datatype.h"
+
 INT32 serial_getc();
 void serial_putc(const INT8 c);
 void serial_puts(const INT8 *s);

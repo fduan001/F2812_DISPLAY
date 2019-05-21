@@ -7,7 +7,7 @@
 
 #ifndef SHELLCONSOLE_H_
 #define SHELLCONSOLE_H_
-#include "shellctype.h"
+#include "F2812_datatype.h"
 #include <stdarg.h>
 extern INT8 console_buffer[];
 void shellputs(const INT8 *s);

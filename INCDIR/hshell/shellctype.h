@@ -50,15 +50,8 @@ extern unsigned char _ctype[];
 #if 1
 typedef unsigned long long     u64;
 typedef long long               s64;
-typedef unsigned long           UINT32;
-typedef unsigned short         UINT16;
-typedef unsigned char          UINT8;
-//typedef          long           INT32;
-typedef          int           INT32;
-typedef          short         INT16;
-typedef          char          INT8; /* would have been better with signed */
+
 typedef void                  *VOID_STAR;      /* kept for compatibility */
-typedef          INT8            ascii;          /* kept for compatibility */
 
 typedef volatile unsigned long	vu_long;
 typedef unsigned char		uchar;
