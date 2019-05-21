@@ -87,6 +87,7 @@ void XINT_Isr1(void) {
     UINT16 args = 0x8;
 
     PRINTF("isr=%x \n", isr_sts);
+#if 0
     if( isr_sts & 0x1 ) {
         args = 0x0;
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask & ~(1 << args)));
@@ -96,6 +97,7 @@ void XINT_Isr1(void) {
         g_isr_info[0].counter++;
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask | (1 << args)));
     }
+#endif
 
     if( isr_sts & 0x2 ) {
         args = 0x1;
@@ -107,6 +109,7 @@ void XINT_Isr1(void) {
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask | (1 << args)));
     }
 
+#if 0
     if( isr_sts & 0x4 ) {
         args = 0x2;
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask & ~(1 << args)));
@@ -166,6 +169,7 @@ void XINT_Isr1(void) {
         g_isr_info[7].counter++;
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask | (1 << args)));
     }
+#endif
 
     FPGA_REG16_W(FPGA_XINT1_STATUS_REG, isr_sts);
 }
