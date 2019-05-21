@@ -21,10 +21,12 @@ static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * con
 {
 	int  rc = 0;
 	unsigned char chip;
+#if 0
 	char party;
 	unsigned char stop;
 	unsigned char data_bit;
 	unsigned int baud;
+#endif
 
 #if 0
 	if (argc != 6)
@@ -35,22 +37,24 @@ static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * con
 #endif
 
 	chip = simple_strtoul(argv[1], NULL, 10);
+#if 0
 	party = simple_strtoul(argv[2], NULL, 10);
 	stop = simple_strtoul(argv[3], NULL, 10);
 	data_bit = simple_strtoul(argv[4], NULL, 10);
 	baud = simple_strtoul(argv[5], NULL, 10);
+#endif
 
 	if( chip == 0 ) {
 		rc = HostUartInit();
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Open(chip, party, stop, data_bit, baud);
+		rc = RS422Open(chip, 'e', 1, 8, 19200);
 		if( rc != 0 ) {
 			PRINTF("RS422Open failed, rc=%d\n", rc);
 			return CMD_RET_FAILURE;
 		}
-		PRINTF("chip=%u party=%u stop=%u data_bit=%u baud=%u\n", chip, party, stop, data_bit, baud);
+		// PRINTF("chip=%u party=%u stop=%u data_bit=%u baud=%u\n", chip, party, stop, data_bit, baud);
 	}
 
 	
