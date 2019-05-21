@@ -111,7 +111,7 @@ void DebugUartRegInfo(unsigned char chipNo)
 }
 
 
-void RS422Isr(UINT8 bit_pos)
+void RS422Isr(UINT16 bit_pos)
 {
     UART_BUFF *pdevFd = NULL;
     UINT8 channel = 0;
@@ -136,6 +136,7 @@ void RS422Isr(UINT8 bit_pos)
         uartRecvHandle(pdevFd);	    	  
     }
 
+    PRINTF("re-enable interrupt\n");
     FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
 
     return;
