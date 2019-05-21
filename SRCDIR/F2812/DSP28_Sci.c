@@ -302,18 +302,24 @@ UINT8  UartCharGetTimeout(UINT32 timeout, int *result)
 
 UINT8 UartCharGetTimeout_B(UINT32 timeout, int *result)
 {
+
+	UINT32 count = 0;
+
     if( result ) {
         *result = 0;
     }
 
-    UINT32 timebase = GetTimer2Cnt();
-    while((GetTimer2Cnt() - timebase) <= timeout)
+    while(1)
     {
         if(1 == SciaRx_Ready())
         {
             return (unsigned char)(SciaRegs.SCIRXBUF.all);
-
         }
+        ++count;
+        if( count > timeout ) {
+        	break;
+        }
+        PlatformDelay(1);
     }
 
     if( result ) {
