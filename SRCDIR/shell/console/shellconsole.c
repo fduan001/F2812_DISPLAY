@@ -482,9 +482,9 @@ INT32 readline_into_buffer (const INT8 *const prompt, INT8 *buffer)
 }
 
 /****************************************************************************/
-int parse_line (INT8 *line, INT8 *argv[])
+INT32 parse_line (INT8 *line, INT8 *argv[])
 {
-    int nargs = 0;
+    INT32 nargs = 0;
 
 
     while (nargs < CONFIG_SYS_MAXARGS)
