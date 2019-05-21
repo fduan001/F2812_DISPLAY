@@ -362,6 +362,8 @@ int RS422SetBaud(UINT8 chipNo,UINT32 baud)
     UART_REG(DLH,pdevFd) = dlh;
     UART_REG(DLL,pdevFd) = dll;
 
+    PRINTF("dlh=%x dll=%x reg_dlh=%x reg_dll=%x\n", dlh, dll, UART_REG(DLH,pdevFd), UART_REG(DLL,pdevFd));
+
     UART_REG(LCR,pdevFd) = (UART_REG(LCR,pdevFd) & (~LCR_CLKDIV_ACCESS));
 
     return ret;
