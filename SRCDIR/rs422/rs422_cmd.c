@@ -119,20 +119,29 @@ static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * co
 	int rc = 0;
 	int chip;
 	unsigned int bytes;
-	unsigned int source;
+	UINT8  magic[10];
+
+	magic[0] = 0x7e;
+	magic[1] = 0x01;
+	magic[2] = 0x5a;
+	magic[3] = 0x6d;
+	magic[4] = 0x32;
+	magic[5] = 0x33;
+	magic[6] = 0x65;
+	magic[7] = 0x00;
+	magic[8] = 0x02;
+	magic[9] = 0x7f;
 
 	chip = simple_strtoul(argv[1], NULL, 10);
-	source = simple_strtoul(argv[2], NULL, 16);
-	bytes = simple_strtoul(argv[3], NULL, 10);
 
 	if( chip == 0 ) {
-		rc = HostUartSend((char*)source, bytes);
+		rc = HostUartSend(magic, sizeof(magic));
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Write(chip, (char*)source, bytes);
+		rc = RS422Write(chip, magic, sizeof(magic));
 	}
-	if( rc != bytes ) {
+	if( rc != sizeof(magic) ) {
 		PRINTF("RS422Write failed\n");
 		return CMD_RET_FAILURE;
 	}
