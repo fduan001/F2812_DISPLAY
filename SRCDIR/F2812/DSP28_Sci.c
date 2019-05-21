@@ -321,7 +321,7 @@ UINT8 UartCharGetTimeout_B(UINT32 timeout, int *result)
     {
         if(1 == ScibRx_Ready())
         {
-            return (UINT8)(SciaRegs.SCIRXBUF.all);
+            return (UINT8)(ScibRegs.SCIRXBUF.all);
         }
         ++count;
         if( count > timeout ) {
