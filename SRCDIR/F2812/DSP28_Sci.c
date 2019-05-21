@@ -67,8 +67,15 @@ void InitSci(void)
 
     ScibRegs.SCIHBAUD = (SCI_BAUD >> 8) & 0xff;
     ScibRegs.SCILBAUD = (SCI_BAUD) & 0xFF;
+
+    ScibRegs.SCIFFTX.all=0xC028;
+    ScibRegs.SCIFFRX.all=0x0028;
+    ScibRegs.SCIFFCT.all=0x00;
+
     /* enable SCI*/
     ScibRegs.SCICTL1.all = (SCICTL1_CFG | 0x20);
+    ScibRegs.SCIFFTX.bit.TXFIFOXRESET=1;
+    ScibRegs.SCIFFRX.bit.RXFIFORESET=1;
 	
 }
 
