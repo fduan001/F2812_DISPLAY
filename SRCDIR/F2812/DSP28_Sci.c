@@ -137,17 +137,15 @@ INT16 SciaRx_Ready(void)
 }
 
 INT16 ScibRx_Ready(void)
-{
-    UINT8 i;
-    if(ScibRegs.SCIRXST.bit.RXRDY == 1)
-    {
-        i = 1;
+{ 
+    UINT8 val = 0;
+    val = ScibRegs.SCIFFRX.bit.RXFIFST;
+    if( val != 0 ) {
+        return 1;
+    } else {
+        return 0;
     }
-    else
-    {
-        i = 0;
-    }
-    return(i);
+
 }
 /******************************************************************************
  *
@@ -287,18 +285,22 @@ void UartPrintf(const char *fmt, ...)
 
 UINT8  UartCharGetTimeout(UINT32 timeout, int *result)
 {
+    UINT32 count = 0;
+
     if( result ) {
         *result = 0;
     }
 
-    UINT32 timebase = GetTimer2Cnt();
-    while((GetTimer2Cnt() - timebase) <= timeout)
-    {
+    while(1) {
         if(1 == SciaRx_Ready())
         {
-            return (unsigned char)(SciaRegs.SCIRXBUF.all);
-
+            return (UINT8)(SciaRegs.SCIRXBUF.all);
         }
+        ++count;
+        if( count > timeout ) {
+            break;
+        }
+        PlatformDelay(1);
     }
 
     if( result ) {
@@ -309,7 +311,6 @@ UINT8  UartCharGetTimeout(UINT32 timeout, int *result)
 
 UINT8 UartCharGetTimeout_B(UINT32 timeout, int *result)
 {
-
 	UINT32 count = 0;
 
     if( result ) {
@@ -318,9 +319,9 @@ UINT8 UartCharGetTimeout_B(UINT32 timeout, int *result)
 
     while(1)
     {
-        if(1 == SciaRx_Ready())
+        if(1 == ScibRx_Ready())
         {
-            return (unsigned char)(SciaRegs.SCIRXBUF.all);
+            return (UINT8)(SciaRegs.SCIRXBUF.all);
         }
         ++count;
         if( count > timeout ) {
