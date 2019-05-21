@@ -12,11 +12,12 @@
 #include "serial.h"
 #include "config.h"
 #include "command.h"
+#include "F2812_datatype.h"
 #include "shellctype.h"
 
 
 #define putnstr(str,n)	do {			\
-		shellprintf ("%.*s", (s32)n, str);	\
+		shellprintf ("%.*s", (INT32)n, str);	\
 	} while (0)
 
 #define CTL_CH(c)		((c) - 'a' + 1)
@@ -24,8 +25,8 @@
 #define MAX_CMDBUF_SIZE		CONFIG_SYS_CBSIZE
 
 #define CTL_BACKSPACE		('\b')
-#define DEL			((s8)255)
-#define DEL7			((s8)127)
+#define DEL			((INT8)255)
+#define DEL7			((INT8)127)
 #define CREAD_HIST_CHAR		('!')
 
 #define getcmd_putch(ch)	shellputc(ch)
@@ -39,36 +40,36 @@
 #define HIST_SIZE		MAX_CMDBUF_SIZE
 
 #pragma DATA_SECTION   (hist_max,"shell_lib");
-static far s32 hist_max = 0;
+static INT32 hist_max = 0;
 #pragma DATA_SECTION   (hist_add_idx,"shell_lib");
-static far s32 hist_add_idx = 0;
+static INT32 hist_add_idx = 0;
 #pragma DATA_SECTION   (hist_cur,"shell_lib");
-static far s32 hist_cur = -1;
+static INT32 hist_cur = -1;
 #pragma DATA_SECTION   (hist_num,"shell_lib");
-far u32 hist_num = 0;
+UINT32 hist_num = 0;
 #pragma DATA_SECTION   (hist_list,"shell_lib");
-far s8 *hist_list[HIST_MAX];
+INT8 *hist_list[HIST_MAX];
 #pragma DATA_SECTION   (hist_lines,"shell_lib");
-far s8 hist_lines[HIST_MAX][HIST_SIZE + 1];	 /* Save room for NULL */
+INT8 hist_lines[HIST_MAX][HIST_SIZE + 1];	 /* Save room for NULL */
 
 #define add_idx_minus_one() ((hist_add_idx == 0) ? hist_max : hist_add_idx-1)
 
 #pragma DATA_SECTION   (console_buffer,"shell_lib");
-far s8    console_buffer[CONFIG_SYS_CBSIZE + 1];	/* console I/O buffer	*/
+INT8    console_buffer[CONFIG_SYS_CBSIZE + 1];	/* console I/O buffer	*/
 #pragma DATA_SECTION   (erase_seq,"shell_lib");
-far static s8 erase_seq[] = "\b \b";		/* erase sequence	*/
+static INT8 erase_seq[] = "\b \b";		/* erase sequence	*/
 #pragma DATA_SECTION   (tab_seq,"shell_lib");
-far static s8   tab_seq[] = "        ";		/* used to expand TABs	*/
+static INT8   tab_seq[] = "        ";		/* used to expand TABs	*/
 
 
 
 
 
-extern s32 readline_into_buffer (const s8 *const prompt, s8 *buffer);
-extern s32 cread_line(const s8 *const prompt, s8 *buf, u32 *len);
-extern s32 run_netshell_command (const s8 *cmd, s32 flag);
+extern INT32 readline_into_buffer (const INT8 *const prompt, INT8 *buffer);
+extern INT32 cread_line(const INT8 *const prompt, INT8 *buf, UINT32 *len);
+extern INT32 run_netshell_command (const INT8 *cmd, INT32 flag);
 
-far int udpprintrdy = 0;
+int udpprintrdy = 0;
 // net shell bufferextern char
 
 
@@ -76,48 +77,48 @@ far int udpprintrdy = 0;
         console  input and output
 ****************************************************************************/
 
-void shellsetudpprintmode(u8 enable)
+void shellsetudpprintmode(UINT8 enable)
 {
     udpprintrdy = enable;
 }
 
-u8 shellgetudprintmode()
+UINT8 shellgetudprintmode()
 {
     return udpprintrdy;
 }
 
-void shellputs(const s8 *s)
+void shellputs(const INT8 *s)
 {
     serial_puts(s);
 }
 
 /****************************************************************************/
 
-void shellputc(const s8 c)
+void shellputc(const INT8 c)
 {
     serial_putc(c);
 }
 
 /****************************************************************************/
-s32 shellgetc(void)
+INT32 shellgetc(void)
 {
     return serial_getc();
 }
 
 /****************************************************************************/
 #pragma DATA_SECTION   (printbuffer,"shell_lib");
-far  s8 printbuffer[CONFIG_SYS_PBSIZE];
+far  INT8 printbuffer[CONFIG_SYS_PBSIZE];
 
 extern void Osal_ExitGlobalCriticalSection();
 extern void Osal_EnterGlobalCriticalSection();
 
-s32 shellprintf(const s8 *fmt, ...)
+INT32 shellprintf(const INT8 *fmt, ...)
 {
     va_list args;
-    s32 i;
+    INT32 i;
     //yexin remove stack size
 
-    s32 size;
+    INT32 size;
 
 
 #ifdef  SERIALSHELL
@@ -178,7 +179,7 @@ s32 shellprintf(const s8 *fmt, ...)
  ********************************************************************/
 static void hist_init(void)
 {
-    s32 i;
+    INT32 i;
 
     hist_max = 0;
     hist_add_idx = 0;
@@ -192,7 +193,7 @@ static void hist_init(void)
     }
 }
 
-static void cread_add_to_hist(s8 *line)
+static void cread_add_to_hist(INT8 *line)
 {
     strcpy(hist_list[hist_add_idx], line);
 
@@ -205,10 +206,10 @@ static void cread_add_to_hist(s8 *line)
     hist_num++;
 }
 
-static s8 *hist_prev(void)
+static INT8 *hist_prev(void)
 {
-    s8 *ret;
-    s32 old_cur;
+    INT8 *ret;
+    INT32 old_cur;
 
     if (hist_cur < 0)
         return NULL;
@@ -228,9 +229,9 @@ static s8 *hist_prev(void)
     return (ret);
 }
 
-static s8 *hist_next(void)
+static INT8 *hist_next(void)
 {
-    s8 *ret;
+    INT8 *ret;
 
     if (hist_cur < 0)
         return NULL;
@@ -254,8 +255,8 @@ static s8 *hist_next(void)
 #ifndef CONFIG_CMDLINE_EDITING
 static void cread_print_hist_list(void)
 {
-    s32 i;
-    u32 n;
+    INT32 i;
+    UINT32 n;
 
     n = hist_num - hist_max;
 
@@ -278,9 +279,9 @@ static void cread_print_hist_list(void)
 
 /****************************************************************************/
 
-static s8 *delete_char (s8 *buffer, s8 *p, s32 *colp, s32 *np, s32 plen)
+static INT8 *delete_char (INT8 *buffer, INT8 *p, INT32 *colp, INT32 *np, INT32 plen)
 {
-    s8 *s;
+    INT8 *s;
 
     if (*np == 0)
     {
@@ -326,7 +327,7 @@ static s8 *delete_char (s8 *buffer, s8 *p, s32 *colp, s32 *np, s32 plen)
  *		-1 if break
  *		-2 if timed out
  */
-s32 readline (const s8 *const prompt)
+INT32 readline (const INT8 *const prompt)
 {
     /*
      * If console_buffer isn't 0-length the user will be prompted to modify
@@ -339,13 +340,13 @@ s32 readline (const s8 *const prompt)
 
 /****************************************************************************/
 
-s32 readline_into_buffer (const s8 *const prompt, s8 *buffer)
+INT32 readline_into_buffer (const INT8 *const prompt, INT8 *buffer)
 {
-    s8 *p = buffer;
+    INT8 *p = buffer;
 #ifdef CONFIG_CMDLINE_EDITING
-    u32 len = MAX_CMDBUF_SIZE;
-    s32 rc;
-    static s32 initted = 0;
+    UINT32 len = MAX_CMDBUF_SIZE;
+    INT32 rc;
+    static INT32 initted = 0;
 
     /*
      * History uses a global array which is not
@@ -374,12 +375,12 @@ s32 readline_into_buffer (const s8 *const prompt, s8 *buffer)
 #endif	/* CONFIG_CMDLINE_EDITING */
 
 
-        s8 *p_buf = p;
-        s32	n = 0;				/* buffer index		*/
-        s32	plen = 0;			/* prompt length	*/
-        s32	col;				/* output column cnt	*/
-        s8	c;
-        s32   data;
+        INT8 *p_buf = p;
+        INT32	n = 0;				/* buffer index		*/
+        INT32	plen = 0;			/* prompt length	*/
+        INT32	col;				/* output column cnt	*/
+        INT8	c;
+        INT32   data;
 
         /* print prompt */
         if (prompt)
@@ -481,9 +482,9 @@ s32 readline_into_buffer (const s8 *const prompt, s8 *buffer)
 }
 
 /****************************************************************************/
-s32 parse_line (s8 *line, s8 *argv[])
+int parse_line (INT8 *line, INT8 *argv[])
 {
-    s32 nargs = 0;
+    int nargs = 0;
 
 
     while (nargs < CONFIG_SYS_MAXARGS)
@@ -513,7 +514,7 @@ s32 parse_line (s8 *line, s8 *argv[])
         if (*line == '\0')  	/* end of line, no more args	*/
         {
             argv[nargs] = NULL;
-
+            shellprintf("fduan001 %d\n", nargs);
             return (nargs);
         }
 
@@ -528,21 +529,21 @@ s32 parse_line (s8 *line, s8 *argv[])
 
 /****************************************************************************/
 #pragma DATA_SECTION   (envname,"shell_lib");
-far s8 envname[CONFIG_SYS_CBSIZE];
+far INT8 envname[CONFIG_SYS_CBSIZE];
 
-static void process_macros (const s8 *input, s8 *output)
+static void process_macros (const INT8 *input, INT8 *output)
 {
-    s8 c, prev;
-    const s8 *varname_start = NULL;
-    s32 inputcnt = strlen (input);
-    s32 outputcnt = CONFIG_SYS_CBSIZE;
-    s32 state = 0;		/* 0 = waiting for '$'  */
+    INT8 c, prev;
+    const INT8 *varname_start = NULL;
+    INT32 inputcnt = strlen (input);
+    INT32 outputcnt = CONFIG_SYS_CBSIZE;
+    INT32 state = 0;		/* 0 = waiting for '$'  */
 
     /* 1 = waiting for '(' or '{' */
     /* 2 = waiting for ')' or '}' */
     /* 3 = waiting for '''  */
 #ifdef DEBUG_PARSER
-    s8 *output_start = output;
+    INT8 *output_start = output;
 
     shellprintf ("[PROCESS_MACROS] INPUT len %d: \"%s\"\n", strlen (input),
                  input);
@@ -607,11 +608,11 @@ static void process_macros (const s8 *input, s8 *output)
         case 2:	/* Waiting for )        */
             if (c == ')' || c == '}')
             {
-                s32 i;
+                INT32 i;
 		   //yexin 20180630 ,remove stack size
-               // s8 envname[CONFIG_SYS_CBSIZE], *envval;
-                s8  *envval;
-                s32 envcnt = input - varname_start - 1;	/* Varname # of chars */
+               // INT8 envname[CONFIG_SYS_CBSIZE], *envval;
+                INT8  *envval;
+                INT32 envcnt = input - varname_start - 1;	/* Varname # of chars */
 
                 /* Get the varname */
                 for (i = 0; i < envcnt; i++)
@@ -661,17 +662,17 @@ static void process_macros (const s8 *input, s8 *output)
 }
 
 /****************************************************************************
- check input s8
+ check input INT8
  ***************************************************************************/
-s32 tstc(void)
+INT32 tstc(void)
 {
     return serial_tstc();
 
 }
 /****************************************************************************/
-static s32 ctrlc_disabled = 0;	/* see disable_ctrl() */
-static s32 ctrlc_was_pressed = 0;
-s32 ctrlc(void)
+static INT32 ctrlc_disabled = 0;	/* see disable_ctrl() */
+static INT32 ctrlc_was_pressed = 0;
+INT32 ctrlc(void)
 {
     if (!ctrlc_disabled)
     {
@@ -698,7 +699,7 @@ void clear_ctrlc(void)
 }
 
 /****************************************************************************/
-s32 had_ctrlc (void)
+INT32 had_ctrlc (void)
 {
     return ctrlc_was_pressed;
 }
@@ -721,23 +722,23 @@ s32 had_ctrlc (void)
  */
  
 #pragma DATA_SECTION   (cmdbuf,"shell_lib");
- far s8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
+ far INT8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
 #pragma DATA_SECTION   (finaltoken,"shell_lib");
- far s8 finaltoken[CONFIG_SYS_CBSIZE];
-s32 run_command (const s8 *cmd, s32 flag)
+ far INT8 finaltoken[CONFIG_SYS_CBSIZE];
+INT32 run_command (const INT8 *cmd, INT32 flag)
 {
     cmd_tbl_t *cmdtp;
 // yexin 20180630 remove stack size
-//    s8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
-    s8 *token;			/* start of token in cmdbuf	*/
-    s8 *sep;			/* end of token (separator) in cmdbuf */
+//    INT8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
+    INT8 *token;			/* start of token in cmdbuf	*/
+    INT8 *sep;			/* end of token (separator) in cmdbuf */
 // yexin 20180630 remove stack size	
- //   s8 finaltoken[CONFIG_SYS_CBSIZE];
-    s8 *str = cmdbuf;
-    s8 *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
-    s32 argc, inquotes;
-    s32 repeatable = 1;
-    s32 rc = 0;
+ //   INT8 finaltoken[CONFIG_SYS_CBSIZE];
+    INT8 *str = cmdbuf;
+    INT8 *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
+    int argc, inquotes;
+    int repeatable = 1;
+    int rc = 0;
 
 #ifdef DEBUG_PARSER
     shellprintf ("[RUN_COMMAND] cmd[%p]=\"", cmd);
@@ -848,7 +849,7 @@ s32 run_command (const s8 *cmd, s32 flag)
             }
         }
 #endif
-
+        shellprintf("fduan001 argc=%d\n", argc);
         /* OK - call function to do the command */
         if ((cmdtp->cmd) (cmdtp, flag, argc, argv) != 0)
         {
@@ -883,19 +884,19 @@ s32 run_command (const s8 *cmd, s32 flag)
  *  this command is only used for netshell
  */
 
-s32 run_netshell_command (const s8 *cmd, s32 flag)
+INT32 run_netshell_command (const INT8 *cmd, INT32 flag)
 {
 #if 0
     cmd_tbl_t *cmdtp;
-    s8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
-    s8 *token;			/* start of token in cmdbuf	*/
-    s8 *sep;			/* end of token (separator) in cmdbuf */
-    s8 finaltoken[CONFIG_SYS_CBSIZE];
-    s8 *str = cmdbuf;
-    s8 *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
-    s32 argc, inquotes;
-    s32 repeatable = 1;
-    s32 rc = 0;
+    INT8 cmdbuf[CONFIG_SYS_CBSIZE];	/* working copy of cmd		*/
+    INT8 *token;			/* start of token in cmdbuf	*/
+    INT8 *sep;			/* end of token (separator) in cmdbuf */
+    INT8 finaltoken[CONFIG_SYS_CBSIZE];
+    INT8 *str = cmdbuf;
+    INT8 *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
+    INT32 argc, inquotes;
+    INT32 repeatable = 1;
+    INT32 rc = 0;
 
 #ifdef DEBUG_PARSER
     shellprintf ("[RUN_COMMAND] cmd[%p]=\"", cmd);;
@@ -925,7 +926,7 @@ s32 run_netshell_command (const s8 *cmd, s32 flag)
 #endif
 #ifdef    BIOSSHELL
 
-    extern  void ti_sysbios_knl_Task_sleep__E(u32 nticks);
+    extern  void ti_sysbios_knl_Task_sleep__E(UINT32 nticks);
     //delay 100ms
     //    ti_sysbios_knl_Task_sleep__E(SHELL_DELAY);
 #endif
@@ -1038,7 +1039,7 @@ s32 run_netshell_command (const s8 *cmd, s32 flag)
 
 #define ERASE_TO_EOL() {				\
 	if (num < eol_num) {				\
-		shellprintf("%*s", (s32)(eol_num - num), ""); \
+		shellprintf("%*s", (INT32)(eol_num - num), ""); \
 		do {					\
 			getcmd_putch(CTL_BACKSPACE);	\
 		} while (--eol_num > num);		\
@@ -1054,10 +1055,10 @@ s32 run_netshell_command (const s8 *cmd, s32 flag)
 }
 
 
-void cread_add_char(s8 ichar, s32 insert, u32 *num,
-                    u32 *eol_num, s8 *buf, u32 len)
+void cread_add_char(INT8 ichar, INT32 insert, UINT32 *num,
+                    UINT32 *eol_num, INT8 *buf, UINT32 len)
 {
-    u32 wlen;
+    UINT32 wlen;
 
     /* room ??? */
     if (insert || *num == *eol_num)
@@ -1096,8 +1097,8 @@ void cread_add_char(s8 ichar, s32 insert, u32 *num,
     }
 }
 
-void cread_add_str(s8 *str, s32 strsize, s32 insert, u32 *num,
-                   u32 *eol_num, s8 *buf, u32 len)
+void cread_add_str(INT8 *str, INT32 strsize, INT32 insert, UINT32 *num,
+                   UINT32 *eol_num, INT8 *buf, UINT32 len)
 {
     while (strsize--)
     {
@@ -1110,17 +1111,17 @@ void cread_add_str(s8 *str, s32 strsize, s32 insert, u32 *num,
 	-1 for ctlr +c
 	-2 for  timeout
 */
-s32 cread_line(const s8 *const prompt, s8 *buf, u32 *len)
+INT32 cread_line(const INT8 *const prompt, INT8 *buf, UINT32 *len)
 {
-    u32 num = 0;
-    u32 eol_num = 0;
-    u32 wlen;
-    s8 ichar;
-    s32 insert = 1;
-    s32 esc_len = 0;
-    s8 esc_save[8];
-    s32 init_len = strlen(buf);
-    s32 data;
+    UINT32 num = 0;
+    UINT32 eol_num = 0;
+    UINT32 wlen;
+    INT8 ichar;
+    INT32 insert = 1;
+    INT32 esc_len = 0;
+    INT8 esc_save[8];
+    INT32 init_len = strlen(buf);
+    INT32 data;
 
     if (init_len)
         cread_add_str(buf, init_len, 1, &num, &eol_num, buf, *len);
@@ -1292,7 +1293,7 @@ s32 cread_line(const s8 *const prompt, s8 *buf, u32 *len)
         case CTL_CH('p'):
         case CTL_CH('n'):
         {
-            s8 *hline;
+            INT8 *hline;
 
             esc_len = 0;
 
@@ -1323,7 +1324,7 @@ s32 cread_line(const s8 *const prompt, s8 *buf, u32 *len)
 #ifdef CONFIG_AUTO_COMPLETE
         case '\t':
         {
-            s32 num2, col;
+            INT32 num2, col;
 
             /* do not autocomplete when in the middle */
             if (num < eol_num)

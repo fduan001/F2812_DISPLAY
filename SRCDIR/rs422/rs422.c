@@ -26,24 +26,24 @@ typedef int BOOL;
 #define  RS422_CHIP1_INT_BIT      0
 #define  RS422_CHIP2_INT_BIT      1
 
-#define   RS422_BASE_ADDR    (0x8000 + 0x60)
+#define   RS422_BASE_ADDR    (0x80000 + 0x60)
 
 #define UART_REG(reg, pchan) \
-    (*(volatile unsigned short *)(((unsigned int)(pchan->baseAddr)) + (reg * 1)))
+    (*(volatile unsigned short *)(((UINT32)(pchan->baseAddr)) + (reg)))
 
 
 typedef struct{
 
     BOOL isOpen;
 
-    unsigned char RXBuffer[RX_LEN]; // [# of buffers][RX_LEN bytes]
-    unsigned int  msgrd,msgwr;	
+    UINT8 RXBuffer[RX_LEN]; // [# of buffers][RX_LEN bytes]
+    UINT32  msgrd,msgwr;
 
     HANDLE   rx_semSync;
 
-    unsigned int baseAddr;
-    unsigned char reset_bit;
-    unsigned char int_bit;
+    UINT32 baseAddr;
+    UINT8 reset_bit;
+    UINT8 int_bit;
 
 }  UART_BUFF;
 
@@ -60,6 +60,10 @@ unsigned char UART_INT_BIT[RS422_NUM]={
     RS422_CHIP2_INT_BIT,
 };
 
+void RS422SysDataInit(void) {
+	memset(altera_uart_buff, 0, sizeof(altera_uart_buff));
+}
+
 void uartReset(unsigned char chipNo);
 int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
 void uartRecvHandle(UART_BUFF * pDev);
@@ -68,18 +72,18 @@ int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
 
 void DebugSysReg(void)
 {
-    PRINTF("0x%08x = 0x%04x\r\n",  FPGA_PERIPHERAL_RST_REG,  FPGA_REG16_R(FPGA_PERIPHERAL_RST_REG));
-    PRINTF("0x%08x = 0x%04x\r\n",  FPGA_XINT1_STATUS_REG,   FPGA_REG16_R(FPGA_XINT1_STATUS_REG));
-    PRINTF("0x%08x = 0x%04x\r\n",  FPGA_XINT1_MASK_REG,   FPGA_REG16_R(FPGA_XINT1_MASK_REG));
+    shellprintf("%08lx: = 0x%04x\r\n",  FPGA_PERIPHERAL_RST_REG,  FPGA_REG16_R(FPGA_PERIPHERAL_RST_REG));
+    shellprintf("%08lx = 0x%04x\r\n",  FPGA_XINT1_STATUS_REG,   FPGA_REG16_R(FPGA_XINT1_STATUS_REG));
+    shellprintf("%08lx = 0x%04x\r\n",  FPGA_XINT1_MASK_REG,   FPGA_REG16_R(FPGA_XINT1_MASK_REG));
 }
 void DebugUartReg(UART_BUFF *pdevFd)
 {
     if(pdevFd == NULL)
         return;
-    PRINTF("0x%08x:IER = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(IER,pdevFd));
-    PRINTF("0x%08x:IIR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(IIR,pdevFd));
-    PRINTF("0x%08x:LSR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(LSR,pdevFd));
-    PRINTF("0x%08x:LCR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(LCR,pdevFd));    
+    shellprintf("%08lx:IER = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(IER,pdevFd));
+    shellprintf("%08lx:IIR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(IIR,pdevFd));
+    shellprintf("%08lx:LSR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(LSR,pdevFd));
+    shellprintf("%08lx:LCR = 0x%04x\r\n",pdevFd->baseAddr,UART_REG(LCR,pdevFd));
 }
 
 void DebugUartRegInfo(unsigned char chipNo)
@@ -100,8 +104,8 @@ void RS422Isr(UINT8 bit_pos)
     UART_BUFF *pdevFd = NULL;
     int channel = 0;
 
-    FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
 
+    FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << bit_pos))));
     for(channel = 0;channel < RS422_NUM ;channel++)
     {
         pdevFd = &altera_uart_buff[channel];
@@ -120,7 +124,7 @@ void RS422Isr(UINT8 bit_pos)
 
     }
 
-    FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << bit_pos))));
+    FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
 
     return;
 }
@@ -136,8 +140,10 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
     if(chipNo >= RS422_NUM)
         return(ERROR);
 
-    if(pdevFd->isOpen == TRUE)
+    if(pdevFd->isOpen == TRUE) {
+    	PRINTF("is already open\n");
         return(ERROR);
+    }
 
     RS422Init(chipNo);
 
@@ -170,7 +176,8 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
             uartintUserCnt++;
             if(uartintUserCnt == 1)
             {
-                FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << irqnum))));
+                // FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << irqnum))));
+                FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << irqnum)));
             }
         }
     }else uartintUserCnt++;   
@@ -435,6 +442,8 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
 
     if (pdevFd == NULL)
         return (ERROR);
+
+    PRINTF("write %d bytes\n", nBytes);
 
     for(index = 0;index < nBytes;index++)
     {

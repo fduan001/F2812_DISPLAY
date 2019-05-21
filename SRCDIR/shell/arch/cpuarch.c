@@ -5,8 +5,7 @@
  *      Author: Administrator
  */
 
-#include "shellctype.h"
-//#include "boardlib.h"
+#include "F2812_datatype.h"
 
 
 #ifdef HOST_PC
@@ -17,13 +16,13 @@
 #else
 #include "stdint.h"
 //#include "c66x_fpga.h"
-extern void platform_c66x_delay(u32  usecs);
+extern void platform_c66x_delay(UINT32  usecs);
 extern void platform_resettimer();
-extern u32 platform_gettimer(u32 base);
+extern UINT32 platform_gettimer(UINT32 base);
 
-extern void PlatformDelay (u16 usec);
+extern void PlatformDelay (UINT16 usec);
 extern void PlatformResetTimer();
-extern u16  PlatformGetTimer();
+extern UINT16  PlatformGetTimer();
 
 
 #if 0
@@ -56,7 +55,7 @@ void reset_timer()
     RESETIMER();
 #endif
 }
-u32 get_timer (u32 base)
+UINT32 get_timer (UINT32 base)
 {
 #ifdef HOST_PC
     return 0;
@@ -70,7 +69,7 @@ u32 get_timer (u32 base)
 
 
 
-void udelay(u32 usec)
+void udelay(UINT32 usec)
 {
 
     UDELAY( usec);
@@ -91,7 +90,7 @@ void enable_interrupts (void)
 
 
 
-void *map_physmem(phys_addr_t paddr, u32 len, u32 flags)
+void *map_physmem(phys_addr_t paddr, UINT32 len, UINT32 flags)
 {
     return (void *)paddr;
 }

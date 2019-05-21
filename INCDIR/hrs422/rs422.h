@@ -5,14 +5,14 @@
 
 #define   RBR     0x00
 #define   THR     0x00
-#define   IER     0x02
-#define   IIR     0x04
-#define   FCR     0x04
-#define   LCR     0x06
-#define   LSR     0x0a
+#define   IER     0x01
+#define   IIR     0x02
+#define   FCR     0x02
+#define   LCR     0x03
+#define   LSR     0x05
 
 #define   DLL    0x00
-#define   DLH    0x02
+#define   DLH    0x01
 
 
 #define  IER_RECV_VALID     (1 << 0)

@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 #include "shellctype.h"
-s32 serial_getc();
-void serial_putc(const s8 c);
-void serial_puts(const s8 *s);
-s32 serial_tstc (void);
+INT32 serial_getc();
+void serial_putc(const INT8 c);
+void serial_puts(const INT8 *s);
+INT32 serial_tstc (void);
 
 
 #endif /* SERIAL_H_ */

@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-
+#include "F2812_datatype.h"
 #include "config.h"
 #include "command.h"
 #include "util.h"
@@ -15,31 +15,20 @@
 #define WATCHDOG_RESET()
 
 #pragma DATA_SECTION   (base_address,"shell_lib");
-static   far u32 base_address = 0x0;
+static   far UINT32 base_address = 0x0;
 #pragma DATA_SECTION   (dp_last_addr,"shell_lib");
 #pragma DATA_SECTION   (dp_last_size,"shell_lib");
-u32  	far dp_last_addr, dp_last_size;
+UINT32  	far dp_last_addr, dp_last_size;
 #pragma DATA_SECTION   (dp_last_length,"shell_lib");
-u32	far dp_last_length = 0x40;
+UINT32	far dp_last_length = 0x40;
 #pragma DATA_SECTION   (mm_last_addr,"shell_lib");
 #pragma DATA_SECTION   (mm_last_size,"shell_lib");
-u32	far mm_last_addr, mm_last_size;
+UINT32	far mm_last_addr, mm_last_size;
 
-
-
-/*int do_mem_mm ( cmd_tbl_t *cmdtp,  flag, int argc, char * const argv[])
+INT32 do_mem_mw ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-	return mod_mem (cmdtp, 1, flag, argc, argv);
-}
-int do_mem_nm ( cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-	return mod_mem (cmdtp, 0, flag, argc, argv);
-}*/
-
-int do_mem_mw ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
-{
-    u32	addr, writeval, count;
-    s32	size;
+    UINT32	addr, writeval, count;
+    INT32	size;
 
     if ((argc < 3) || (argc > 4))
         return cmd_usage(cmdtp);
@@ -90,12 +79,9 @@ int do_mem_mw ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
  */
 #define DISP_LINE_LEN	16
 
-int do_mem_md ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_md ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     ulong	addr, length;
-#if defined(CONFIG_HAS_DATAFLASH)
-    ulong	nbytes, linebytes;
-#endif
     int	size;
     int rc = 0;
 
@@ -131,43 +117,12 @@ int do_mem_md ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
         }
     }
 
-#if defined(CONFIG_HAS_DATAFLASH)
-    /* Print the lines.
-     *
-     * We buffer all read data, so we can make sure data is read only
-     * once, and all accesses are with the specified bus width.
-     */
-    nbytes = length * size;
-    do
-    {
-        s8	linebuf[DISP_LINE_LEN];
-        void *p;
-        linebytes = (nbytes > DISP_LINE_LEN) ? DISP_LINE_LEN : nbytes;
 
-        rc = read_dataflash(addr, (linebytes / size) * size, linebuf);
-        p = (rc == DATAFLASH_OK) ? linebuf : (void *)addr;
-        print_buffer(addr, p, size, linebytes / size, DISP_LINE_LEN / size);
-
-        nbytes -= linebytes;
-        addr += linebytes;
-        if (ctrlc())
-        {
-            rc = 1;
-            break;
-        }
-    }
-    while (nbytes > 0);
-#else
-
-
-
-    {
         /* Print the lines. */
         print_buffer(addr, (void *)addr, size, length, DISP_LINE_LEN / size);
         //addr += size * length;
         addr += length;
-    }
-#endif
+
 
     dp_last_addr = addr;
     dp_last_length = length;
@@ -183,12 +138,12 @@ int do_mem_md ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
  *	mm{.b, .w, .l} {addr}
  *	nm{.b, .w, .l} {addr}
  */
-static s32
-mod_mem(cmd_tbl_t *cmdtp, s32 incrflag, s32 flag, s32 argc, s8 *const argv[])
+static INT32
+mod_mem(cmd_tbl_t *cmdtp, INT32 incrflag, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-    u32	addr, i;
-    s32	nbytes, size;
-    extern s8 console_buffer[];
+    UINT32	addr, i;
+    INT32	nbytes, size;
+    extern INT8 console_buffer[];
 
     if (argc != 2)
         return cmd_usage(cmdtp);
@@ -293,16 +248,16 @@ mod_mem(cmd_tbl_t *cmdtp, s32 incrflag, s32 flag, s32 argc, s8 *const argv[])
 }
 
 
-s32 do_mem_mm ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_mm ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     return mod_mem (cmdtp, 1, flag, argc, argv);
 }
-s32 do_mem_nm ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_nm ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     return mod_mem (cmdtp, 0, flag, argc, argv);
 }
 
-s32 do_mem_base (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_base (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     if (argc > 1)
     {
@@ -317,11 +272,11 @@ s32 do_mem_base (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 }
 
 
-s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_cmp (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-    u32	addr1, addr2, count, ngood;
-    s32	size;
-    s32     rcode = 0;
+    UINT32	addr1, addr2, count, ngood;
+    INT32	size;
+    INT32     rcode = 0;
 
     if (argc != 4)
         return cmd_usage(cmdtp);
@@ -355,8 +310,8 @@ s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         if (size == 4)
         {
-            u32 word1 = *(u32 *)addr1;
-            u32 word2 = *(u32 *)addr2;
+            UINT32 word1 = *(UINT32 *)addr1;
+            UINT32 word2 = *(UINT32 *)addr2;
             if (word1 != word2)
             {
                 shellprintf("word at 0x%08lx (0x%08lx) "
@@ -368,8 +323,8 @@ s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
         }
         else if (size == 2)
         {
-            u16 hword1 = *(u16 *)addr1;
-            u16 hword2 = *(u16 *)addr2;
+            UINT16 hword1 = *(UINT16 *)addr1;
+            UINT16 hword2 = *(UINT16 *)addr2;
             if (hword1 != hword2)
             {
                 shellprintf("halfword at 0x%08lx (0x%04x) "
@@ -381,8 +336,8 @@ s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
         }
         else
         {
-            u8 byte1 = *(u8 *)addr1;
-            u8 byte2 = *(u8 *)addr2;
+            UINT8 byte1 = *(UINT8 *)addr1;
+            UINT8 byte2 = *(UINT8 *)addr2;
             if (byte1 != byte2)
             {
                 shellprintf("byte at 0x%08lx (0x%02x) "
@@ -407,13 +362,13 @@ s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 }
 
 
-s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_loopw (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-    u32	addr, length, i, data;
-    s32	size;
-    volatile u32	*longp;
-    volatile u16 *shortp;
-    volatile u8	*cp;
+    UINT32	addr, length, i, data;
+    INT32	size;
+    volatile UINT32	*longp;
+    volatile UINT16 *shortp;
+    volatile UINT8	*cp;
 
     if (argc < 4)
         return cmd_usage(cmdtp);
@@ -442,17 +397,17 @@ s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         if (size == 4)
         {
-            longp = (u32 *)addr;
+            longp = (UINT32 *)addr;
             for (;;)
                 *longp = data;
         }
         if (size == 2)
         {
-            shortp = (u16 *)addr;
+            shortp = (UINT16 *)addr;
             for (;;)
                 *shortp = data;
         }
-        cp = (u8 *)addr;
+        cp = (UINT8 *)addr;
         for (;;)
             *cp = data;
     }
@@ -461,7 +416,7 @@ s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         for (;;)
         {
-            longp = (u32 *)addr;
+            longp = (UINT32 *)addr;
             i = length;
             while (i-- > 0)
                 *longp++ = data;
@@ -471,7 +426,7 @@ s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         for (;;)
         {
-            shortp = (u16 *)addr;
+            shortp = (UINT16 *)addr;
             i = length;
             while (i-- > 0)
                 *shortp++ = data;
@@ -479,7 +434,7 @@ s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     }
     for (;;)
     {
-        cp = (u8 *)addr;
+        cp = (UINT8 *)addr;
         i = length;
         while (i-- > 0)
             *cp++ = data;
@@ -487,13 +442,13 @@ s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     // return 0;
 }
 
-s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_loop (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-    u8	addr, length, i, junk;
-    s32	size;
-    volatile u32	*longp;
-    volatile u16 *shortp;
-    volatile u8	*cp;
+    UINT8	addr, length, i, junk;
+    INT32	size;
+    volatile UINT32	*longp;
+    volatile UINT16 *shortp;
+    volatile UINT8	*cp;
 
     if (argc < 3)
         return cmd_usage(cmdtp);
@@ -519,17 +474,17 @@ s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         if (size == 4)
         {
-            longp = (u32 *)addr;
+            longp = (UINT32 *)addr;
             for (;;)
                 i = *longp;
         }
         if (size == 2)
         {
-            shortp = (u16 *)addr;
+            shortp = (UINT16 *)addr;
             for (;;)
                 i = *shortp;
         }
-        cp = (u8 *)addr;
+        cp = (UINT8 *)addr;
         for (;;)
             i = *cp;
     }
@@ -538,7 +493,7 @@ s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         for (;;)
         {
-            longp = (u32 *)addr;
+            longp = (UINT32 *)addr;
             i = length;
             while (i-- > 0)
                 junk = *longp++;
@@ -548,7 +503,7 @@ s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     {
         for (;;)
         {
-            shortp = (u16 *)addr;
+            shortp = (UINT16 *)addr;
             i = length;
             while (i-- > 0)
                 junk = *shortp++;
@@ -556,7 +511,7 @@ s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     }
     for (;;)
     {
-        cp = (u8 *)addr;
+        cp = (UINT8 *)addr;
         i = length;
         while (i-- > 0)
             junk = *cp++;
@@ -569,27 +524,27 @@ s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
  * configured using CONFIG_SYS_ALT_MEMTEST. The complete test loops until
  * interrupted by ctrl-c or by a failure of one of the sub-tests.
  */
-s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_mtest (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
-    u16	*addr, *start, *end;
-    u16	val;
-    u16	readback;
-    u16	errs = 0;
+    UINT16	*addr, *start, *end;
+    UINT16	val;
+    UINT16	readback;
+    UINT16	errs = 0;
     int iterations = 1;
     int iteration_limit;
 
 #if defined(CONFIG_SYS_ALT_MEMTEST)
-    u16	len;
-    u32	offset;
-    u32	test_offset;
-    u16	pattern;
-    u16	temp;
-    u16	anti_pattern;
-    u32	num_words;
+    UINT16	len;
+    UINT32	offset;
+    UINT32	test_offset;
+    UINT16	pattern;
+    UINT16	temp;
+    UINT16	anti_pattern;
+    UINT32	num_words;
 #if defined(CONFIG_SYS_MEMTEST_SCRATCH)
-    u16 *dummy = (u16 *)CONFIG_SYS_MEMTEST_SCRATCH;
+    UINT16 *dummy = (UINT16 *)CONFIG_SYS_MEMTEST_SCRATCH;
 #else
-    u16 *dummy = 0;	/* yes, this is address 0x0, not NULL */
+    UINT16 *dummy = 0;	/* yes, this is address 0x0, not NULL */
 #endif
     int	j;
 
@@ -605,27 +560,27 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
         0xaaaaaaaa,	/* alternating 1/0 */
     };
 #else
-    u16	incr;
-    u16	pattern;
+    UINT16	incr;
+    UINT16	pattern;
 #endif
 
     if (argc > 1)
-        start = (u16 *)simple_strtoul(argv[1], NULL, 16) + base_address;
+        start = (UINT16 *)simple_strtoul(argv[1], NULL, 16) + base_address;
     else
-        start = (u16 *)CONFIG_SYS_MEMTEST_START;
+        start = (UINT16 *)CONFIG_SYS_MEMTEST_START;
 
     if (argc > 2)
-        end = (u16 *)simple_strtoul(argv[2], NULL, 16) + base_address;
+        end = (UINT16 *)simple_strtoul(argv[2], NULL, 16) + base_address;
     else
-        end = (u16 *)(CONFIG_SYS_MEMTEST_END);
+        end = (UINT16 *)(CONFIG_SYS_MEMTEST_END);
 
     if (argc > 3)
-        pattern = (u16)simple_strtoul(argv[3], NULL, 16);
+        pattern = (UINT16)simple_strtoul(argv[3], NULL, 16);
     else
         pattern = 0;
 
     if (argc > 4)
-        iteration_limit = (u16)simple_strtoul(argv[4], NULL, 16);
+        iteration_limit = (UINT16)simple_strtoul(argv[4], NULL, 16);
     else
         iteration_limit = 0;
 
@@ -744,9 +699,9 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
          *
          * Returns:     0 if the test succeeds, 1 if the test fails.
          */
-        len = ((u16)end - (u16)start) / sizeof(u16);
-        pattern = (u16) 0xaaaa;
-        anti_pattern = (u16) 0x5555;
+        len = ((UINT16)end - (UINT16)start) / sizeof(UINT16);
+        pattern = (UINT16) 0xaaaa;
+        anti_pattern = (UINT16) 0x5555;
 
         PRINTF("%s:%d: length = 0x%x\n",
                __FUNCTION__, __LINE__,
@@ -773,7 +728,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
             {
                 shellprintf ("\nFAILURE: Address bit stuck high @ 0x%.8lx:"
                              " expected 0x%.8lx, actual 0x%.8lx\n",
-                             (u16)&start[offset], pattern, temp);
+                             (UINT16)&start[offset], pattern, temp);
                 errs++;
                 if (ctrlc())
                 {
@@ -799,7 +754,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
                 {
                     shellprintf ("\nFAILURE: Address bit stuck low or shorted @"
                                  " 0x%x: expected 0x%x, actual 0x%x\n",
-                                 (u16)&start[offset], pattern, temp);
+                                 (UINT16)&start[offset], pattern, temp);
                     errs++;
                     if (ctrlc())
                     {
@@ -823,7 +778,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
          *
          * Returns:     0 if the test succeeds, 1 if the test fails.
          */
-        num_words = ((u16)end - (u16)start) / sizeof(u16) + 1;
+        num_words = ((UINT16)end - (UINT16)start) / sizeof(UINT16) + 1;
 
         /*
          * Fill memory with a known pattern.
@@ -845,7 +800,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
             {
                 shellprintf ("\nFAILURE (read/write) @ 0x%x:"
                              " expected 0x%x, actual 0x%x)\n",
-                             (u16)&start[offset], pattern, temp);
+                             (UINT16)&start[offset], pattern, temp);
                 errs++;
                 if (ctrlc())
                 {
@@ -870,7 +825,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
             {
                 shellprintf ("\nFAILURE (read/write): @ 0x%x:"
                              " expected 0x%x, actual 0x%x)\n",
-                             (u16)&start[offset], anti_pattern, temp);
+                             (UINT16)&start[offset], anti_pattern, temp);
                 errs++;
                 if (ctrlc())
                 {
@@ -922,7 +877,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
             {
                 shellprintf ("\nMem error @ 0x%08X: "
                              "found %08lX, expected %08lX\n",
-                             (u16)addr, readback, val);
+                             (UINT16)addr, readback, val);
                 errs++;
                 if (ctrlc())
                 {
@@ -954,7 +909,7 @@ s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 }
 
 
-s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_mem_cp ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     ulong	addr, dest, count;
     int	size;
@@ -990,7 +945,7 @@ s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 #endif
        )
     {
-        s32 rc;
+        INT32 rc;
 
         shellputs ("Copy to Flash... ");
 
@@ -1009,7 +964,7 @@ s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     /* Check if we are copying from RAM or Flash to DataFlash */
     if (addr_dataflash(dest) && !addr_dataflash(addr))
     {
-        s32 rc;
+        INT32 rc;
 
         shellputs ("Copy to DataFlash... ");
 
@@ -1031,7 +986,7 @@ s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 #endif
        )
     {
-        s32 rc;
+        INT32 rc;
         rc = read_dataflash(addr, count * size, (char *) dest);
         if (rc != 1)
         {
@@ -1054,11 +1009,11 @@ s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
     while (count-- > 0)
     {
         if (size == 4)
-            *((volatile u32 *)dest) = *((volatile u32 *)addr);
+            *((volatile UINT32 *)dest) = *((volatile UINT32 *)addr);
         else if (size == 2)
-            *((volatile u16 *)dest) = *((volatile u16 *)addr);
+            *((volatile UINT16 *)dest) = *((volatile UINT16 *)addr);
         else
-            *((volatile u8 *)dest) = *((volatile u8 *)addr);
+            *((volatile UINT8 *)dest) = *((volatile UINT8 *)addr);
         addr += size;
         dest += size;
     }

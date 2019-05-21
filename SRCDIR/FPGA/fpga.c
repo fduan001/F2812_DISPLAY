@@ -20,6 +20,7 @@
 #include "F2812_datatype.h"
 #include "boardcfg.h"
 #include "fpga.h"
+#include "shellconsole.h"
 
 void WriteFpgaRegister( UINT32 regaddr, UINT16 regvalue)
 {
@@ -85,6 +86,7 @@ void XINT_Isr1(void) {
     UINT16 isr_mask = FPGA_REG16_R(FPGA_XINT1_MASK_REG);
     UINT16 args = 0x8;
 
+    PRINTF("isr=%x \n", isr_sts);
     if( isr_sts & 0x1 ) {
         args = 0x0;
         FPGA_REG16_W(FPGA_XINT1_MASK_REG, (isr_mask & ~(1 << args)));
@@ -185,7 +187,7 @@ void SysUDelay(int timeout) {
     FPGA_REG16_W(FPGA_UDELAY_CTRL_REG, 0x3);
     while(1) {
         if( FPGA_REG16_R(FPGA_UDELAY_COUNT_REG) >= timeout ) {
-            return;
+            break;
         }
     }
 

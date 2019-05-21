@@ -39,33 +39,33 @@ cmd_tbl_t __u_boot_cmd_##name Struct_Section = {#name, maxargs, rep, cmd, usage}
 
 struct cmd_tbl_s
 {
-    s8		*name;		/* Command Name			*/
-    s32		maxargs;	/* maximum number of arguments	*/
-    s32		repeatable;	/* autorepeat allowed?		*/
+    INT8		*name;		/* Command Name			*/
+    INT32		maxargs;	/* maximum number of arguments	*/
+    INT32		repeatable;	/* autorepeat allowed?		*/
     /* Implementation function	*/
-    s32		(*cmd)(struct cmd_tbl_s *, s32, s32, s8 *const []);
-    s8		*usage;		/* Usage message	(short)	*/
+    INT32		(*cmd)(struct cmd_tbl_s *, INT32, INT32, INT8 *const []);
+    INT8		*usage;		/* Usage message	(short)	*/
 #ifdef	CONFIG_SYS_LONGHELP
-    s8		*help;		/* Help  message	(long)	*/
+    INT8		*help;		/* Help  message	(long)	*/
 #endif
 #ifdef CONFIG_AUTO_COMPLETE
     /* do auto completion on the arguments */
-    s32		(*complete)(s32 argc, s8 *const argv[], s8 last_char, s32 maxv, s8 *cmdv[]);
+    INT32		(*complete)(INT32 argc, INT8 *const argv[], INT8 last_char, INT32 maxv, INT8 *cmdv[]);
 #endif
 };
 
 typedef struct cmd_tbl_s	cmd_tbl_t;
-//typedef s32 (*PCOMMANDFUNC)(s32, s32);
-typedef s32 (* PCOMMANDFUNC)(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
+//typedef INT32 (*PCOMMANDFUNC)(INT32, INT32);
+typedef INT32 (* PCOMMANDFUNC)(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
 
 
 
-cmd_tbl_t *find_cmd_tbl (const s8 *cmd, cmd_tbl_t *table, s32 table_len);
-cmd_tbl_t *find_cmd (const s8 *cmd);
-cmd_tbl_t *find_netshell_cmd(const s8 *cmd);
-s32 cmd_usage(cmd_tbl_t *cmdtp);
-s32 cmd_get_data_size(s8 *arg, s32 default_size);
-u8 RegisterCommand (cmd_tbl_t commanditem);
+cmd_tbl_t *find_cmd_tbl (const INT8 *cmd, cmd_tbl_t *table, INT32 table_len);
+cmd_tbl_t *find_cmd (const INT8 *cmd);
+cmd_tbl_t *find_netshell_cmd(const INT8 *cmd);
+INT32 cmd_usage(cmd_tbl_t *cmdtp);
+INT32 cmd_get_data_size(INT8 *arg, INT32 default_size);
+UINT8 RegisterCommand (cmd_tbl_t commanditem);
 
 typedef enum {
 	CMD_RET_SUCCESS = 0,

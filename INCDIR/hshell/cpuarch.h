@@ -59,11 +59,11 @@
 
 void sync();
 void reset_timer();
-u32 get_timer (u32 base);
-void udelay(u32 usec);
-s32 disable_interrupts(void);
+UINT32 get_timer (UINT32 base);
+void udelay(UINT32 usec);
+INT32 disable_interrupts(void);
 void enable_interrupts (void);
-void *map_physmem(phys_addr_t paddr, u32 len, u32 flags);
+void *map_physmem(phys_addr_t paddr, UINT32 len, UINT32 flags);
 
 
 #endif

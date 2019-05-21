@@ -22,10 +22,10 @@
 #include "util.h"
 #include "platform_os.h"
 
-s32 do_isr ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_isr ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     char *ops;
-    u16  num;
+    UINT16  num;
     /*check input arg number*/
     if (argc < 3)
     {
@@ -63,7 +63,7 @@ far cmd_tbl_t isrcmd[] =
 
 void MidCmdInitialize()
 {
-    s8 index;
+    INT8 index;
 
     for (index = 0; index < sizeof(isrcmd) / sizeof(cmd_tbl_t); index++)
         RegisterCommand(isrcmd[index]);

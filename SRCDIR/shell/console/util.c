@@ -5,16 +5,13 @@
  *      Author: Administrator
  */
 
-//#include "shellctype.h"
+#include "F2812_datatype.h"
 #include "config.h"
 #include "shellconsole.h"
-#include <ctype.h>
 
-
-
-u32 simple_strtoul(const s8 *cp, s8 **endp, u32 base)
+UINT32 simple_strtoul(const INT8 *cp, INT8 **endp, UINT32 base)
 {
-    u32 result = 0, value;
+    UINT32 result = 0, value;
 
     if (*cp == '0')
     {
@@ -45,7 +42,7 @@ u32 simple_strtoul(const s8 *cp, s8 **endp, u32 base)
 }
 
 
-u32 simple_strtol(const s8 *cp, s8 **endp, u32 base)
+UINT32 simple_strtol(const INT8 *cp, INT8 **endp, UINT32 base)
 {
     if(*cp == '-')
         return -simple_strtoul(cp + 1, endp, base);
@@ -53,9 +50,9 @@ u32 simple_strtol(const s8 *cp, s8 **endp, u32 base)
 }
 
 
-u32  simple_strtoull (const s8 *cp, s8 **endp, u32 base)
+UINT32  simple_strtoull (const INT8 *cp, INT8 **endp, UINT32 base)
 {
-    u32  result = 0, value;
+    UINT32  result = 0, value;
 
     if (*cp == '0')
     {
@@ -94,15 +91,15 @@ u32  simple_strtoull (const s8 *cp, s8 **endp, u32 base)
 #pragma DATA_SECTION   (lb,"shell_lib");
 union linebuf
 {
-        u32 ui[MAX_LINE_LENGTH_BYTES / sizeof(u32) + 1];
-        u16 us[MAX_LINE_LENGTH_BYTES / sizeof(u16) + 1];
-        u8  uc[MAX_LINE_LENGTH_BYTES / sizeof(u8) + 1];
+        UINT32 ui[MAX_LINE_LENGTH_BYTES / sizeof(UINT32) + 1];
+        UINT16 us[MAX_LINE_LENGTH_BYTES / sizeof(UINT16) + 1];
+        UINT8  uc[MAX_LINE_LENGTH_BYTES / sizeof(UINT8) + 1];
 } lb;
 
-s32 print_buffer (u32 addr, void *data, u32 width, u32 count, u32 linelen)
+INT32 print_buffer (UINT32 addr, void *data, UINT32 width, UINT32 count, UINT32 linelen)
 {
 
-    s32 i;
+    INT32 i;
 
     if (linelen * width > MAX_LINE_LENGTH_BYTES)
         linelen = MAX_LINE_LENGTH_BYTES / width;
@@ -120,29 +117,29 @@ s32 print_buffer (u32 addr, void *data, u32 width, u32 count, u32 linelen)
         /* Copy from memory into linebuf and print hex values */
         for (i = 0; i < linelen; i++)
         {
-            u32 x;
+            UINT32 x;
 	     //yexin changed for F2812 c compiler 20180707
             if (width == 4)
             	{
-                x = lb.ui[i] = *(volatile u32 *)data;
+                x = lb.ui[i] = *(volatile UINT32 *)data;
                 shellprintf(" %08lx", x);
             	}
             else if (width == 2)
             	{
-                x = lb.us[i] = *(volatile u16 *)data;
-		  shellprintf(" %04x",(u16) x);
+                x = lb.us[i] = *(volatile UINT16 *)data;
+		  shellprintf(" %04x",(UINT16) x);
             	}
             else
             	{
-                x = lb.uc[i] = *(volatile u8 *)data;
-                shellprintf(" %02x", (u8)x);
+                x = lb.uc[i] = *(volatile UINT8 *)data;
+                shellprintf(" %02x", (UINT8)x);
             	}
    //         shellprintf(" %0*x", width * 2, x);
 
             //data += width;
-            data += 1;
+            ((UINT32)data) += 1;
             //  for c6000 compiler
-            //	data= (void*)((u32)data+width);
+            //	data= (void*)((UINT32)data+width);
         }
 
         /* Print data in ASCII characters */

@@ -37,7 +37,7 @@
 
 #include "shellctype.h"
 #if 0
-u8 _ctype[] =
+UINT8 _ctype[] =
 {
     _C, _C, _C, _C, _C, _C, _C, _C,			/* 0-7 */
     _C, _C | _S, _C | _S, _C | _S, _C | _S, _C | _S, _C, _C,		/* 8-15 */

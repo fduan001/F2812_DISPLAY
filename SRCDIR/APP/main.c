@@ -157,6 +157,8 @@ void ShellTask()
 	shell_loop();
 }
 
+extern 	void RS422SysDataInit(void);
+
 /*
  *  ======== main ========
  */
@@ -170,7 +172,7 @@ Void main()
 	//DdcInit(DDC_MODE_RT, 0);
 	UartPrintf("Init HW WATCHDOG\n");
 	WatchdogInit();
-	UartPrintf("Enable HW WATCHDOG\n");
+	UartPrintf("Enable HW WATCHDOG, sizeof(unsignedlong)=%d\n", sizeof(unsigned long));
 	WatchdogEnable();
 	WatchdogKick();
 	UartPrintf("create shell task\n");
@@ -182,6 +184,9 @@ Void main()
 
 	SetCpuUsTimer2();
 
+
+
+	RS422SysDataInit();
 	BIOS_start ();
 
     /*

@@ -5,10 +5,7 @@
  *      Author: yexin
  */
 #include <stdio.h>
-#include "shellctype.h"
-
-
-
+#include "F2812_datatype.h"
 
 //#define HOST_PC
 #ifdef HOST_PC
@@ -24,9 +21,9 @@
 #define CPU_GETTSC()  Shell_16C550_tsc()
 */
 //simulate for evm
-extern void UartCharPut(u8 byteTx);
-extern u8 UartGetc(void);
-extern s16 SciaRx_Ready(void);
+extern void UartCharPut(UINT8 byteTx);
+extern UINT8 UartGetc(void);
+extern INT16 SciaRx_Ready(void);
 
 #define CPU_PUTC     UartCharPut
 //#define CPU_GETC     c66xUartReadchar
@@ -37,14 +34,14 @@ extern s16 SciaRx_Ready(void);
 #endif
 
 /****************************************************************************/
-s32 serial_getc()
+INT32 serial_getc()
 {
 
     return (CPU_GETC());
 
 }
 /****************************************************************************/
-void serial_putc(const s8 c)
+void serial_putc(const INT8 c)
 {
     if(c == '\n')
     {
@@ -58,7 +55,7 @@ void serial_putc(const s8 c)
 
 }
 /****************************************************************************/
-void serial_puts(const s8 *s)
+void serial_puts(const INT8 *s)
 {
     while(*s)
     {
@@ -68,7 +65,7 @@ void serial_puts(const s8 *s)
 }
 
 /****************************************************************************/
-s32 serial_tstc (void)
+INT32 serial_tstc (void)
 {
 #ifdef HOST
     return CPU_GETC();

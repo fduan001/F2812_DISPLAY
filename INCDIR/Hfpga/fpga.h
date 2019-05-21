@@ -1,7 +1,7 @@
 #ifndef  FPGA_H
 #define  FPGA_H
 
-#define FPGA_BASE_ADDR                                  0x8000
+#define FPGA_BASE_ADDR                                  0x80000
 
 #define FPGA_VER_YEAR_REG                               (FPGA_BASE_ADDR + 0x0)
 #define FPGA_VER_DATE_REG                               (FPGA_BASE_ADDR + 0x1)
@@ -49,8 +49,8 @@
 
 typedef void (*ISR_HANDLER)(void*);
 
-#define FPGA_REG16_W(addr,b)    (*(volatile unsigned short*)((unsigned int)(addr)) = b)
-#define FPGA_REG16_R(addr) 	    (*(volatile unsigned short*)((unsigned int)(addr)))
+#define FPGA_REG16_W(addr,b)    WriteFpgaRegister(addr, b)
+#define FPGA_REG16_R(addr) 	    ReadFpgaRegister(addr)
 
 
 #define FPGABITMASK(x,y)      (   (   (  ((UINT16)1 << (((UINT16)x)-((UINT16)y)+(UINT16)1) ) - (UINT16)1 )   )   <<  ((UINT16)y)   )    // Sets a bitmask of 1s from [x:y]

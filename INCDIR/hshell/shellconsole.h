@@ -9,27 +9,27 @@
 #define SHELLCONSOLE_H_
 #include "shellctype.h"
 #include <stdarg.h>
-extern s8 console_buffer[];
-void shellputs(const s8 *s);
-void shellputc(const s8 c);
-s32 shellgetc(void);
-s32 shellprintf(const s8 *fmt, ...);
-s32 tstc(void);
-s32 ctrlc(void);
-u8 set_shellprompt (char* p);
-s32 parse_line (s8 *line, s8 *argv[]);
-s32 readline (const s8 *const prompt);
-s32 readline_into_buffer (const s8 *const prompt, s8 *buffer);
+extern INT8 console_buffer[];
+void shellputs(const INT8 *s);
+void shellputc(const INT8 c);
+INT32 shellgetc(void);
+INT32 shellprintf(const INT8 *fmt, ...);
+INT32 tstc(void);
+INT32 ctrlc(void);
+UINT8 set_shellprompt (char* p);
+INT32 parse_line (INT8 *line, INT8 *argv[]);
+INT32 readline (const INT8 *const prompt);
+INT32 readline_into_buffer (const INT8 *const prompt, INT8 *buffer);
 void clear_ctrlc(void);
-s32 had_ctrlc (void);
-s32 run_command (const s8 *cmd, s32 flag);
+INT32 had_ctrlc (void);
+INT32 run_command (const INT8 *cmd, INT32 flag);
 
 int shellvsprintf(char *buf, const char *fmt, va_list args);
 int sprintf(char *buf, const char *fmt, ...);
 
-void shellsetudpprintmode(u8 enable);
-u8  shellgetudprintmode();
-void shell_log_msg(const char * file, const int line, u32 mask, const char* format, ...);
+void shellsetudpprintmode(UINT8 enable);
+UINT8  shellgetudprintmode();
+void shell_log_msg(const char * file, const int line, UINT32 mask, const char* format, ...);
 
 #define PRINTF  shellprintf
 

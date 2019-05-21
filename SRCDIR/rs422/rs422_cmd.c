@@ -17,7 +17,7 @@
 #define DISP_LINE_LEN	16
 #endif
 
-static int do_rs422_init(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const argv[])
+static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * const argv[])
 {
 	int  rc = 0;
 	unsigned char chip;
@@ -57,7 +57,7 @@ static int do_rs422_init(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const arg
 	return CMD_RET_SUCCESS;
 }
 
-static int do_rs422_show(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv[])
+static INT32 do_rs422_show(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * const argv[])
 {
 	unsigned char chip;
 	chip = simple_strtoul(argv[1], NULL, 10);
@@ -71,7 +71,7 @@ static int do_rs422_show(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	return CMD_RET_SUCCESS;
 }
 
-static int do_rs422_read(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv[])
+static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * const argv[])
 {
 	int rc = 0;
 	int chip;
@@ -110,7 +110,7 @@ static int do_rs422_read(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv
 	return CMD_RET_SUCCESS;
 }
 
-static int do_rs422_write(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const argv[])
+static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * const argv[])
 {
 	int rc = 0;
 	int chip;
@@ -128,7 +128,7 @@ static int do_rs422_write(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const ar
 	if( chip == 1 ) {
 		rc = RS422Write(chip, (char*)source, bytes);
 	}
-	if( rc != 0 ) {
+	if( rc != bytes ) {
 		PRINTF("RS422Write failed\n");
 		return CMD_RET_FAILURE;
 	}
@@ -139,7 +139,7 @@ static int do_rs422_write(cmd_tbl_t *cmdtp, s32 flag,  int argc, char * const ar
 
 #define  UT_LEN   16
 
-static int do_rs422_test(cmd_tbl_t *cmdtp, s32 flag, int argc, char * const argv[])
+static INT32 do_rs422_test(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * const argv[])
 {
 	int  rc = 0;
 	unsigned char cbuf[64];
@@ -237,7 +237,7 @@ static cmd_tbl_t cmd_rs422_sub[] = {
 	{"test", 1, 1, do_rs422_test, "", ""},
 };
 
-static int do_rs422(cmd_tbl_t * cmdtp, s32 flag, int argc, char * const argv[])
+static INT32 do_rs422(cmd_tbl_t * cmdtp, INT32 flag, INT32 argc, char * const argv[])
 {
 	cmd_tbl_t *c;
 
@@ -278,7 +278,7 @@ far cmd_tbl_t rs422_cmd[] =
 
 int RS422CmdInit(void)
 {
-    s8 index;
+    INT8 index;
     for (index = 0; index < sizeof(rs422_cmd) / sizeof(cmd_tbl_t); index++)
         RegisterCommand(rs422_cmd[index]);
 	return 0;

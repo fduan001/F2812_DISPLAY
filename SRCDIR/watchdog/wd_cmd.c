@@ -23,7 +23,7 @@
 #include "util.h"
 #include "watchdog.h"
 
-s32 do_watchdog ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_watchdog ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
 	char *ops = NULL;
     /*check input arg number*/
@@ -79,7 +79,7 @@ far cmd_tbl_t g_wdog_cmd[] =
 
 int WatchdogCmdInit(void)
 {
-	s8 index;
+	INT8 index;
 	for (index = 0; index < sizeof(g_wdog_cmd) / sizeof(cmd_tbl_t); index++)
 		RegisterCommand(g_wdog_cmd[index]);
 	return 0;

@@ -3,28 +3,29 @@
  *
  */
 
+#include "F2812_datatype.h"
 #include "command.h"
 #include "ossupport.h"
 #include "string.h"
 #include "shellconsole.h"
 
 
-extern s32 do_netshellhelp(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_help(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_nothing(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_base (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_cmp (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_cp ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_loop (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_loopw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_md (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_mm (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_mtest (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_mw (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern s32 do_mem_nm (cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
+extern INT32 do_netshellhelp(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_help(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_nothing(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_base (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_cmp (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_cp ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_loop (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_loopw (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_md (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_mm (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_mtest (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_mw (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern INT32 do_mem_nm (cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
 
 #pragma DATA_SECTION   (cmd_table,"shell_lib");
-far cmd_tbl_t  cmd_table[CONFIG_SYS_CMDSIZE] =
+cmd_tbl_t  cmd_table[CONFIG_SYS_CMDSIZE] =
 {
     {
         "help",	CONFIG_SYS_MAXARGS,	1,	do_help,
@@ -123,10 +124,10 @@ uint16_t cmdtbl_mutex_key;
 
 #endif
 
-u8 RegisterCommand (cmd_tbl_t commanditem)
+UINT8 RegisterCommand (cmd_tbl_t commanditem)
 {
-    s32 index = 0;
-    s32 endindex = 0;
+    INT32 index = 0;
+    INT32 endindex = 0;
 
     //find the END command index
     BSP_CMDTBL_MUTEX_LOCK;
@@ -156,10 +157,10 @@ u8 RegisterCommand (cmd_tbl_t commanditem)
 }
 
 
-u8 CommandTableInit()
+UINT8 CommandTableInit()
 {
-    s32 index = 0;
-    s32 endindex = 0;
+    INT32 index = 0;
+    INT32 endindex = 0;
 
 #if defined BIOS_OS_SUPPORT  &&  defined CMDTBL_MUTEX
     Error_init(&cmdtbl_mutex_eb);

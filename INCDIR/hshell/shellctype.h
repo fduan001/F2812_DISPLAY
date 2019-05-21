@@ -50,14 +50,15 @@ extern unsigned char _ctype[];
 #if 1
 typedef unsigned long long     u64;
 typedef long long               s64;
-typedef unsigned long           u32;
-typedef unsigned short         u16;
-typedef unsigned char          u8;
-typedef          long           s32;
-typedef          short         s16;
-typedef          char          s8; /* would have been better with signed */
+typedef unsigned long           UINT32;
+typedef unsigned short         UINT16;
+typedef unsigned char          UINT8;
+//typedef          long           INT32;
+typedef          int           INT32;
+typedef          short         INT16;
+typedef          char          INT8; /* would have been better with signed */
 typedef void                  *VOID_STAR;      /* kept for compatibility */
-typedef          s8            ascii;          /* kept for compatibility */
+typedef          INT8            ascii;          /* kept for compatibility */
 
 typedef volatile unsigned long	vu_long;
 typedef unsigned char		uchar;
@@ -67,14 +68,14 @@ typedef unsigned long phys_addr_t;
 #if 0
 typedef unsigned long long int u64;
 typedef long long int          s64;
-typedef unsigned int           u32;
-typedef unsigned short         u16;
-typedef unsigned char          u8;
-typedef          int           s32;
-typedef          short         s16;
-typedef          char          s8; /* would have been better with signed */
+typedef unsigned int           UINT32;
+typedef unsigned short         UINT16;
+typedef unsigned char          UINT8;
+typedef          int           INT32;
+typedef          short         INT16;
+typedef          char          INT8; /* would have been better with signed */
 typedef void                  *VOID_STAR;      /* kept for compatibility */
-typedef          s8            ascii;          /* kept for compatibility */
+typedef          INT8            ascii;          /* kept for compatibility */
 //typedef unsigned int  size_t;
 typedef volatile unsigned long	vu_long;
 typedef unsigned char		uchar;

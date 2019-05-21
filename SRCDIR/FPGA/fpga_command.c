@@ -22,12 +22,12 @@
 #include "util.h"
 
 
-s32 do_fpgatest ( cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_fpgatest ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
 
-    u16  repeat,index;
-    u16   readdata, wregdata;
-    u32   regaddr;
+    UINT16  repeat,index;
+    UINT16   readdata, wregdata;
+    UINT32   regaddr;
     /*check input arg number*/
     if (argc < 3)
     {
@@ -73,7 +73,7 @@ far cmd_tbl_t fpgacmd[] =
 
 void FpgaCmdInitialzie()
 {
-    s8 index;
+    INT8 index;
     for (index = 0; index < sizeof(fpgacmd) / sizeof(cmd_tbl_t); index++)
         RegisterCommand(fpgacmd[index]);
 }

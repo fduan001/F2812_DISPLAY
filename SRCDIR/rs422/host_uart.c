@@ -10,8 +10,9 @@ int HostUartSend(UINT8* buffer, UINT16 length) {
 	ret = UartWrite_B(buffer, length);
 	if( ret != length) {
 		PRINTF("Send buffer failed, ret=%d\n", ret);
+
 	}
-	return 0;
+	return ret;
 }
 
 int HostUartRecv(UINT8* buffer, UINT16 length) {
@@ -22,5 +23,5 @@ int HostUartRecv(UINT8* buffer, UINT16 length) {
 		PRINTF("failed to read from uart B, ret=%d\n", ret);
 		return -1;
 	}
-	return 0;
+	return ret;
 }

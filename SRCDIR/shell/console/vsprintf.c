@@ -12,15 +12,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stddef.h>
+#include "F2812_datatype.h"
+
 #include "serial.h"
 #include "config.h"
 #include "command.h"
-#include "shellctype.h"
-#include <stddef.h>
-
-
-
-
 
 # define NUM_TYPE long long
 /* yexin 20180627*/
@@ -35,12 +32,12 @@
 
 
 
-u32 __div64_32(u64 *n, u32 base)
+UINT32 __div64_32(u64 *n, UINT32 base)
 {
     u64 rem = *n;
     u64 b = base;
     u64 res, d = 1;
-    u32 high = rem >> 32;
+    UINT32 high = rem >> 32;
 
     /* Reduce the thing a bit first */
     res = 0;
@@ -74,15 +71,15 @@ u32 __div64_32(u64 *n, u32 base)
 }
 
 #if 0
-u32 do_div(n, base)
+UINT32 do_div(n, base)
 {
-    u32 __base = (base);
-    u32 __rem;
-    (void)(((typeof((n)) *)0) == ((u32 *)0));
+    UINT32 __base = (base);
+    UINT32 __rem;
+    (void)(((typeof((n)) *)0) == ((UINT32 *)0));
     if (((n) >> 32) == 0)
     {
-        __rem = (u32)(n) % __base;
-        (n) = (u32)(n) / __base;
+        __rem = (UINT32)(n) % __base;
+        (n) = (UINT32)(n) / __base;
     }
     else
         __rem = __div64_32(&(n), __base);
@@ -92,12 +89,12 @@ u32 do_div(n, base)
 
 #if 1
 # define do_div(n,base) ({				\
-	u32 __base = (base);			\
-	u32 __rem;					\
-	(void)(((typeof((n)) *)0) == ((u32 *)0));	\
+	UINT32 __base = (base);			\
+	UINT32 __rem;					\
+	(void)(((typeof((n)) *)0) == ((UINT32 *)0));	\
 	if (((n) >> 32) == 0) {			\
-		__rem = (u32)(n) % __base;		\
-		(n) = (u32)(n) / __base;		\
+		__rem = (UINT32)(n) % __base;		\
+		(n) = (UINT32)(n) / __base;		\
 	} else						\
 		__rem = __div64_32(&(n), __base);	\
 	__rem;						\
@@ -124,7 +121,7 @@ const char hex_asc[] = "0123456789abcdef";
 #define hex_asc_lo(x)   hex_asc[((x) & 0x0f)]
 #define hex_asc_hi(x)   hex_asc[((x) & 0xf0) >> 4]
 
-static inline char *pack_hex_byte(char *buf, u8 byte)
+static inline char *pack_hex_byte(char *buf, UINT8 byte)
 {
     *buf++ = hex_asc_hi(byte);
     *buf++ = hex_asc_lo(byte);
@@ -381,7 +378,7 @@ static char *string(char *buf, char *s, int field_width, int precision, int flag
 }
 
 #ifdef CONFIG_CMD_NET
-static char *mac_address_string(char *buf, u8 *addr, int field_width,
+static char *mac_address_string(char *buf, UINT8 *addr, int field_width,
                                 int precision, int flags)
 {
     char mac_addr[6 * 3]; /* (6 * 2 hex digits), 5 colons and trailing zero */
@@ -399,7 +396,7 @@ static char *mac_address_string(char *buf, u8 *addr, int field_width,
     return string(buf, mac_addr, field_width, precision, flags & ~SPECIAL);
 }
 
-static char *ip6_addr_string(char *buf, u8 *addr, int field_width,
+static char *ip6_addr_string(char *buf, UINT8 *addr, int field_width,
                              int precision, int flags)
 {
     char ip6_addr[8 * 5]; /* (8 * 4 hex digits), 7 colons and trailing zero */
@@ -418,7 +415,7 @@ static char *ip6_addr_string(char *buf, u8 *addr, int field_width,
     return string(buf, ip6_addr, field_width, precision, flags & ~SPECIAL);
 }
 
-static char *ip4_addr_string(char *buf, u8 *addr, int field_width,
+static char *ip4_addr_string(char *buf, UINT8 *addr, int field_width,
                              int precision, int flags)
 {
     char ip4_addr[4 * 4]; /* (4 * 3 decimal digits), 3 dots and trailing zero */

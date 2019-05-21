@@ -62,7 +62,7 @@ typedef unsigned int size_t;
 #endif
 #endif
 
-
+typedef unsigned long phys_addr_t;
 
 #endif /* _TPYES_H */
 

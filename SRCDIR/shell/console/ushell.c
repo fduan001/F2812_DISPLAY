@@ -11,21 +11,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "F2812_datatype.h"
 #include "shellconsole.h"
 #include "config.h"
 #include "command.h"
-#include "shellctype.h"
 //#include "watchdog.h"
 
 #pragma DATA_SECTION   (shellstring,"shell_lib");
 far char shellstring[20];
 
 
-extern s32 do_nothing(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[]);
-extern u32 flash_init (void);
-extern u8 RegisterCommand (cmd_tbl_t commanditem);
+extern INT32 do_nothing(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]);
+extern UINT32 flash_init (void);
+extern UINT8 RegisterCommand (cmd_tbl_t commanditem);
 
-u8 set_shellprompt (char* p)
+UINT8 set_shellprompt (char* p)
 {
 	memset(shellstring,0,sizeof(shellstring));
 	if(strlen(p)>19)
@@ -39,14 +39,14 @@ u8 set_shellprompt (char* p)
 }
 
 #pragma DATA_SECTION   (lastcommand,"shell_lib");
- static far s8 lastcommand[CONFIG_SYS_CBSIZE] = { 0, };
+ static far INT8 lastcommand[CONFIG_SYS_CBSIZE] = { 0, };
 void shell_loop (void)
 {
-    s32 len;
-    s32 rc = 1;
-    s32 flag;
+    INT32 len;
+    INT32 rc = 1;
+    INT32 flag;
    //yexin remove stack size
-   // static s8 lastcommand[CONFIG_SYS_CBSIZE] = { 0, };
+   // static INT8 lastcommand[CONFIG_SYS_CBSIZE] = { 0, };
     //	flash_init();
 
     for (;;)

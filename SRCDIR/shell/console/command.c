@@ -5,6 +5,7 @@
  *      Author: yexin
  */
 #include "stdio.h"
+#include "F2812_datatype.h"
 #include "command.h"
 #include "config.h"
 #include "shellconsole.h"
@@ -21,9 +22,9 @@ cmd_tbl_t *boot_cmd_end = &cmd_table[CONFIG_SYS_CMDSIZE - 1];
 
 
 
-s32 cpustrcmp(const s8 *cs, const s8 *ct)
+INT32 cpustrcmp(const INT8 *cs, const INT8 *ct)
 {
-    register s8 __res;
+    register INT8 __res;
 
     while (1)
     {
@@ -38,13 +39,13 @@ s32 cpustrcmp(const s8 *cs, const s8 *ct)
 /***************************************************************************
  * find command table entry for a command
  ***************************************************************************/
-cmd_tbl_t *find_cmd_tbl (const s8 *cmd, cmd_tbl_t *table, s32 table_len)
+cmd_tbl_t *find_cmd_tbl (const INT8 *cmd, cmd_tbl_t *table, INT32 table_len)
 {
     cmd_tbl_t *cmdtp;
     cmd_tbl_t *cmdtp_temp = table;	/*Init value */
-    const s8 *p;
-    s32 len;
-    s32 n_found = 0;
+    const INT8 *p;
+    int len;
+    int n_found = 0;
 
     /*
      * Some commands allow length modifiers (like "cp.b");
@@ -77,27 +78,27 @@ cmd_tbl_t *find_cmd_tbl (const s8 *cmd, cmd_tbl_t *table, s32 table_len)
 }
 
 /****************************************************************************/
-cmd_tbl_t *find_cmd (const s8 *cmd)
+cmd_tbl_t *find_cmd (const INT8 *cmd)
 {
-    s32 len = (boot_cmd_end - boot_cmd_start);
+    INT32 len = (boot_cmd_end - boot_cmd_start);
     return find_cmd_tbl(cmd, boot_cmd_start, len);
-    //       s32 len=group_size;
+    //       INT32 len=group_size;
     //      return find_cmd_tbl(cmd,group_start, len);
 }
 
 /****************************************************************************/
-cmd_tbl_t *find_netshell_cmd (const s8 *cmd)
+cmd_tbl_t *find_netshell_cmd (const INT8 *cmd)
 {
 #if 0
-    s32 len = (boot_netshellcmd_end - boot_netshellcmd_start);
+    INT32 len = (boot_netshellcmd_end - boot_netshellcmd_start);
     return find_cmd_tbl(cmd, boot_netshellcmd_start, len);
-    //       s32 len=group_size;
+    //       INT32 len=group_size;
     //      return find_cmd_tbl(cmd,group_start, len);
 #endif
 
 }
 
-s32 cmd_usage(cmd_tbl_t *cmdtp)
+INT32 cmd_usage(cmd_tbl_t *cmdtp)
 {
     shellprintf("%s - %s\n\n", cmdtp->name, cmdtp->usage);
 
@@ -134,13 +135,13 @@ s32 cmd_usage(cmd_tbl_t *cmdtp)
 far cmd_tbl_t far *cmd_array[CONFIG_SYS_CMDSIZE];
 
 /****************************************************************************/
-s32 _do_help (cmd_tbl_t *cmd_start, s32 cmd_items, cmd_tbl_t *cmdtp, s32
-              flag, s32 argc, s8 *const argv[])
+INT32 _do_help (cmd_tbl_t *cmd_start, INT32 cmd_items, cmd_tbl_t *cmdtp, INT32
+              flag, INT32 argc, INT8 *const argv[])
 {
-    s32 i;
-    s32 rcode = 0;
-	s16 actcmditemnum = 0;
-	s32 j, swaps;
+    INT32 i;
+    INT32 rcode = 0;
+	INT16 actcmditemnum = 0;
+	INT32 j, swaps;
 
     if (argc == 1)  	/*show list of commands */
     {
@@ -182,7 +183,7 @@ s32 _do_help (cmd_tbl_t *cmd_start, s32 cmd_items, cmd_tbl_t *cmdtp, s32
         /* print short help (usage) */
         for (i = 0; i < actcmditemnum; i++)
         {
-            const s8 *usage = cmd_array[i]->usage;
+            const INT8 *usage = cmd_array[i]->usage;
 
             /* allow user abort */
             if (ctrlc ())
@@ -217,7 +218,7 @@ s32 _do_help (cmd_tbl_t *cmd_start, s32 cmd_items, cmd_tbl_t *cmdtp, s32
 }
 
 
-s32 do_help(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_help(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     return _do_help(boot_cmd_start,
                     //		(boot_cmd_end - boot_cmd_start)/(sizeof(cmd_tbl_t)),
@@ -229,17 +230,17 @@ s32 do_help(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
 
 
 
-s32 do_nothing(cmd_tbl_t *cmdtp, s32 flag, s32 argc, s8 *const argv[])
+INT32 do_nothing(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[])
 {
     return 0;
 }
 
 
-s32 cmd_get_data_size(s8 *arg, s32 default_size)
+INT32 cmd_get_data_size(INT8 *arg, INT32 default_size)
 {
     /* Check for a size specification .b, .w or .l.
      */
-    s32 len = strlen(arg);
+    int len = strlen(arg);
     if (len > 2 && arg[len - 2] == '.')
     {
         switch(arg[len - 1])
