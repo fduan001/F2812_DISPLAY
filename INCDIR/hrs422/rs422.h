@@ -1,7 +1,7 @@
 #ifndef RS422_H
 #define RS422_H
 
-#define   SYS_CLK  100000000
+#define   SYS_CLK  150000000
 
 #define   RBR     0x00
 #define   THR     0x00
@@ -64,14 +64,14 @@
 #define  LSR_TRANS_EMTPY   0x40
 #define  LSR_RECV_FIFO_ERROR 0x80
 
-int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit,unsigned int baud);
+int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit, UINT32 baud);
 int RS422Close(unsigned char chipNo);
 int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes);
 int RS422Write(unsigned char chipNo,char * buf,unsigned int nBytes);
 
 int RS422Init(unsigned char chipNo);
 int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned char data_bit);
-int RS422SetBaud(unsigned char chipNo,unsigned int baud);
+int RS422SetBaud(unsigned char chipNo, UINT32 baud);
 
 int HostUartInit(void);
 int HostUartSend(UINT8* buffer, UINT16 length);

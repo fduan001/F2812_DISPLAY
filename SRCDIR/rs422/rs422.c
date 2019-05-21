@@ -130,7 +130,7 @@ void RS422Isr(UINT8 bit_pos)
 }
 
 
-int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit,unsigned int baud)
+int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char data_bit,UINT32 baud)
 {
     int ret = OK;
     int irqnum = UART_INT_BIT[chipNo];
@@ -291,7 +291,7 @@ int RS422Init(unsigned char chipNo)
     if(chipNo >= RS422_NUM)
         return(ERROR);
 
-    memset(pdevFd,0,sizeof(UART_BUFF));      
+    memset(pdevFd, 0, sizeof(UART_BUFF));
 
     pdevFd->baseAddr = RS422_BASE_ADDR + chipNo * 16;
     pdevFd->reset_bit = UART_RESET_BIT[chipNo];
@@ -342,17 +342,17 @@ int RS422SetOpt(unsigned char chipNo,char party,unsigned char stop_bit,unsigned 
     return ret;
 }
 
-int RS422SetBaud(unsigned char chipNo,unsigned int baud)
+int RS422SetBaud(UINT8 chipNo,UINT32 baud)
 {
     int ret = OK;
-    unsigned short dll,dlh;
-    unsigned int clkdiv;
+    UINT16 dll,dlh;
+    UINT32 clkdiv;
 
     UART_BUFF *pdevFd = (UART_BUFF *)&(altera_uart_buff[chipNo]);
 
     UART_REG(LCR,pdevFd) = (UART_REG(LCR,pdevFd) | LCR_CLKDIV_ACCESS);
 
-    clkdiv = SYS_CLK / (16 * (unsigned int)baud);
+    clkdiv = SYS_CLK / (16 * (UINT32)baud);
 
 
     dlh = (clkdiv >> 8) & 0xff;

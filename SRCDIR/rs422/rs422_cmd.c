@@ -50,7 +50,7 @@ static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * con
 			PRINTF("RS422Open failed, rc=%d\n", rc);
 			return CMD_RET_FAILURE;
 		}
-		PRINTF("chip=%u party=%c stop=%u data_bit=%u baud=%u\n", chip, party, stop, data_bit, baud);
+		PRINTF("chip=%u party=%u stop=%u data_bit=%u baud=%u\n", chip, party, stop, data_bit, baud);
 	}
 
 	
