@@ -514,7 +514,7 @@ INT32 parse_line (INT8 *line, INT8 *argv[])
         if (*line == '\0')  	/* end of line, no more args	*/
         {
             argv[nargs] = NULL;
-            shellprintf("fduan001 %d\n", nargs);
+            shellprintf("fduan001 %ld\n", nargs);
             return (nargs);
         }
 
