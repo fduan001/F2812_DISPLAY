@@ -99,7 +99,7 @@ static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 		rc = RS422Read(chip, buff, bytes);
 	}
 
-	if( rc != 0 ) {
+	if( rc != bytes ) {
 		PRINTF("RS422Read failed\n");
 		return CMD_RET_FAILURE;
 	}
