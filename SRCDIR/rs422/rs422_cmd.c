@@ -254,21 +254,13 @@ static INT32 do_rs422(cmd_tbl_t * cmdtp, INT32 flag, INT32 argc, char * const ar
 {
 	cmd_tbl_t *c;
 
-	PRINTF("argc=%d\n", argc);
-#if 0
-	if (argc < 8) {
-
-		return CMD_RET_USAGE;
-	}
-#endif
-	/* Strip off leading 'i2c' command argument */
+	/* Strip off leading 'rs422' command argument */
 	argc--;
 	argv++;
 
 	c = find_cmd_tbl(argv[0], &cmd_rs422_sub[0], ARRAY_SIZE(cmd_rs422_sub));
 
 	if (c) {
-		PRINTF("go to cmd %s\n", argv[0]);
 		return c->cmd(cmdtp, flag, argc, argv);
 	}
 	else
@@ -285,7 +277,7 @@ far cmd_tbl_t rs422_cmd[] =
 		"rs422 show chip \n" \
 		"rs422 test \n" \
 		"rs422 read chip bytes\n" \
-		"rs422 write chip source bytes\n"
+		"rs422 write chip \n"
 	},
 };
 

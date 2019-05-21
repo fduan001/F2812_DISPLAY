@@ -514,7 +514,6 @@ INT32 parse_line (INT8 *line, INT8 *argv[])
         if (*line == '\0')  	/* end of line, no more args	*/
         {
             argv[nargs] = NULL;
-            shellprintf("fduan001 %ld\n", nargs);
             return (nargs);
         }
 
@@ -849,7 +848,6 @@ INT32 run_command (const INT8 *cmd, INT32 flag)
             }
         }
 #endif
-        shellprintf("fduan001 argc=%d\n", argc);
         /* OK - call function to do the command */
         if ((cmdtp->cmd) (cmdtp, flag, argc, argv) != 0)
         {

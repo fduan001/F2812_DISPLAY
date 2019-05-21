@@ -6,6 +6,8 @@
 #include "rs422.h"
 #include "fpga.h"
 
+#define RS422_USR_INTR_MODE   1
+
 typedef int BOOL;
 
 #ifndef ERROR
@@ -29,7 +31,7 @@ typedef int BOOL;
 #define   RS422_BASE_ADDR    (0x80000 + 0x60)
 
 #define UART_REG(reg, pchan) \
-    (*(volatile unsigned short *)(((UINT32)(pchan->baseAddr)) + (reg)))
+(*(volatile unsigned short *)(((UINT32)(pchan->baseAddr)) + (reg)))
 
 
 typedef struct{
@@ -50,15 +52,26 @@ typedef struct{
 int uartintUserCnt = 0;
 UART_BUFF  altera_uart_buff[RS422_NUM];
 
-unsigned char UART_RESET_BIT[RS422_NUM]={
+UINT8 UART_RESET_BIT[RS422_NUM]={
     RS422_CHIP1_RESET_BIT,
     RS422_CHIP2_RESET_BIT,
 };
 
-unsigned char UART_INT_BIT[RS422_NUM]={
+UINT8 UART_INT_BIT[RS422_NUM]={
     RS422_CHIP1_INT_BIT,
     RS422_CHIP2_INT_BIT,
 };
+
+UINT8 BitPos2Chan(UINT8 bit_pos) {
+    UINT8 i = 0;
+    for( i = 0; i < RS422_NUM; ++i ) {
+        if( UART_INT_BIT[i] == bit_pos ) {
+            return i;
+        }
+    }
+
+    return 0xFF;
+}
 
 void RS422SysDataInit(void) {
 	memset(altera_uart_buff, 0, sizeof(altera_uart_buff));
@@ -68,7 +81,6 @@ void uartReset(unsigned char chipNo);
 int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
 void uartRecvHandle(UART_BUFF * pDev);
 int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes);
-
 
 void DebugSysReg(void)
 {
@@ -102,26 +114,26 @@ void DebugUartRegInfo(unsigned char chipNo)
 void RS422Isr(UINT8 bit_pos)
 {
     UART_BUFF *pdevFd = NULL;
-    int channel = 0;
-
+    UINT8 channel = 0;
 
     FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << bit_pos))));
-    for(channel = 0;channel < RS422_NUM ;channel++)
+    channel = BitPos2Chan(bit_pos);
+
+    pdevFd = &altera_uart_buff[channel];
+
+    if(pdevFd == NULL || pdevFd->isOpen != TRUE) {
+        FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
+        return;
+    }
+
+    if((FPGA_REG16_R(FPGA_XINT1_STATUS_REG) & (1 << pdevFd->int_bit)) == 0) {
+        FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
+        return;
+    }
+
+    if((UART_REG(IIR, pdevFd) & IIR_INT) != IIR_INT)
     {
-        pdevFd = &altera_uart_buff[channel];
-
-        if(pdevFd == NULL || pdevFd->isOpen != TRUE)
-            continue;
-
-        if((FPGA_REG16_R(FPGA_XINT1_STATUS_REG) & (1 << pdevFd->int_bit)) == 0)
-            continue;
-
-        if((UART_REG(IIR, pdevFd) & IIR_INT) != IIR_INT)
-            //if((UART_REG(LSR,pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID)
-        {
-            uartRecvHandle(pdevFd);	    	  
-        }
-
+        uartRecvHandle(pdevFd);	    	  
     }
 
     FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << bit_pos)));
@@ -154,17 +166,20 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
     if(RS422SetBaud(chipNo, baud) != OK)
         return(ERROR);
 
+#ifdef RS422_USR_INTR_MODE
     pdevFd->rx_semSync = Osal_SemCreateBinary(0);
 
     if(pdevFd->rx_semSync == NULL)
     {
         return ERROR;
     }
+#endif
 
     pdevFd->isOpen = TRUE;
 
     UART_REG(IER, pdevFd) = IER_RECV_VALID; //EN RECV DATA INT
 
+#ifdef RS422_USR_INTR_MODE
     if(uartintUserCnt == 0)
     {
         if( RegisterIsr(irqnum, RS422Isr) != 0 )
@@ -181,6 +196,7 @@ int RS422Open(unsigned char chipNo,char party,unsigned char stop,unsigned char d
             }
         }
     }else uartintUserCnt++;   
+#endif
 
     if(ret) {
         PRINTF("RS422Open success....\r\n");
@@ -209,6 +225,7 @@ int RS422Close(unsigned char chipNo)
 
     UART_REG(IER, pdevFd) = 0;
 
+#ifdef RS422_USR_INTR_MODE
     if(pdevFd->rx_semSync != NULL)
     {
         Osal_SemDelete(pdevFd->rx_semSync );
@@ -221,6 +238,7 @@ int RS422Close(unsigned char chipNo)
     }
     if(uartintUserCnt > 0)
         uartintUserCnt--;
+#endif
 
     memset(pdevFd,0,sizeof(UART_BUFF));
 
@@ -240,10 +258,12 @@ int RS422Read(unsigned char chipNo,char * buf,unsigned int nBytes)
     if(pdevFd->isOpen != TRUE)
         return(ERROR);
 
+#ifdef RS422_USR_INTR_MODE
     if(ERROR==Osal_SemPend(pdevFd->rx_semSync, ~(0)))
     {	
         return(ERROR);
     }
+#endif
 
     while(((pdevFd->msgrd)!=(pdevFd->msgwr)) && (readNum < nBytes))
     {	
@@ -422,13 +442,14 @@ void uartRecvHandle(UART_BUFF * pDev)
 
     while((UART_REG(LSR,pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID)
     {
-
         data = (UINT16)UART_REG(RBR,pdevFd) ;
         buf[0] = (data >> 0) & 0xff;
 
-        if(uartRecvBytes(pdevFd,(char*)&buf[0],sizeof(buf[0])) != 0)
+        if(uartRecvBytes(pdevFd, (char*)&buf[0],  sizeof(buf[0])) != 0)
         {
+#ifdef RS422_USR_INTR_MODE
             Osal_SemPost(pdevFd->rx_semSync);
+#endif
         }
     }
     return;
@@ -445,7 +466,7 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
     if (pdevFd == NULL)
         return (ERROR);
 
-    PRINTF("write %d bytes\n", nBytes);
+    //PRINTF("write %d bytes\n", nBytes);
 
     for(index = 0;index < nBytes;index++)
     {
