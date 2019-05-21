@@ -56,6 +56,8 @@ void InitSci(void)
     SciaRegs.SCICTL1.all = (SCICTL1_CFG | 0x20);
 
     //SCI B 
+    ScibRegs.SCIFFTX.all=0x8000;
+
      ScibRegs.SCICTL1.all = 0x0;
     /*   8 bit data */
     ScibRegs.SCICCR.all = SCICCR_CFG;
@@ -276,7 +278,7 @@ void UartPrintf(const char *fmt, ...)
 }
 #endif
 
-UINT8  UartCharGetTimeout(UINT16 timeout, int *result)
+UINT8  UartCharGetTimeout(UINT32 timeout, int *result)
 {
     if( result ) {
         *result = 0;
@@ -298,7 +300,7 @@ UINT8  UartCharGetTimeout(UINT16 timeout, int *result)
     return -1;
 }
 
-UINT8 UartCharGetTimeout_B(UINT16 timeout, int *result)
+UINT8 UartCharGetTimeout_B(UINT32 timeout, int *result)
 {
     if( result ) {
         *result = 0;
