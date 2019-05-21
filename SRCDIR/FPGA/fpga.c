@@ -55,7 +55,6 @@ void WriteFpgaRegisterBit(UINT32 regaddr, UINT8 bitpos, UINT8 bitvalue)
 
 UINT8 ReadFpgaRegisterBit(UINT32 regaddr, UINT8 bitpos, UINT8 bitvalue)
 {
-
     UINT16 regValue;
     regValue = ReadFpgaRegister(regaddr);
     return((regValue >> bitpos) & 0x1);
@@ -84,7 +83,7 @@ int RegisterIsr(UINT8 bit_pos, ISR_HANDLER isr) {
 void XINT_Isr1(void) {
     UINT16 isr_sts = FPGA_REG16_R(FPGA_XINT1_STATUS_REG);
     UINT16 isr_mask = FPGA_REG16_R(FPGA_XINT1_MASK_REG);
-    UINT16 args = 0x8;
+    UINT8 args = 0x8;
 
     PRINTF("isr=%x \n", isr_sts);
 #if 0

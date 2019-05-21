@@ -64,6 +64,7 @@ UINT8 UART_INT_BIT[RS422_NUM]={
 
 UINT8 BitPos2Chan(UINT8 bit_pos) {
     UINT8 i = 0;
+    PRINTF("bit_pos=%u\n", bit_pos);
     for( i = 0; i < RS422_NUM; ++i ) {
         if( UART_INT_BIT[i] == bit_pos ) {
             return i;
@@ -111,10 +112,11 @@ void DebugUartRegInfo(unsigned char chipNo)
 }
 
 
-void RS422Isr(UINT16 bit_pos)
+void RS422Isr(void* data)
 {
     UART_BUFF *pdevFd = NULL;
     UINT8 channel = 0;
+    UINT8 bit_pos = *(UINT8)(data);
 
     FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & (~( 1 << bit_pos))));
     channel = BitPos2Chan(bit_pos);
