@@ -203,6 +203,8 @@ INT32 RS422Open(UINT8 chipNo, INT8 party,UINT8 stop,UINT8 data_bit,UINT32 baud)
             }
         }
     }else uartintUserCnt++;   
+#else
+    FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) & ~(0x01 << irqnum)));
 #endif
 
     if(ret) {
