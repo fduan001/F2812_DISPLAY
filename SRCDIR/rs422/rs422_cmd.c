@@ -110,6 +110,7 @@ static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 			PRINTF("\n");
 		}
 	}
+	PRINTF("\n");
 
 	return CMD_RET_SUCCESS;
 }
