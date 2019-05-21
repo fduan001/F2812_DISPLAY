@@ -736,9 +736,9 @@ INT32 run_command (const INT8 *cmd, INT32 flag)
  //   INT8 finaltoken[CONFIG_SYS_CBSIZE];
     INT8 *str = cmdbuf;
     INT8 *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
-    int argc, inquotes;
-    int repeatable = 1;
-    int rc = 0;
+    INT32 argc, inquotes;
+    INT32 repeatable = 1;
+    INT32 rc = 0;
 
 #ifdef DEBUG_PARSER
     shellprintf ("[RUN_COMMAND] cmd[%p]=\"", cmd);

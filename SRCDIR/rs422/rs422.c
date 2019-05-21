@@ -417,13 +417,13 @@ int uartRecvBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
 void uartRecvHandle(UART_BUFF * pDev)
 {
     UART_BUFF *pdevFd = (UART_BUFF *)pDev;
-    unsigned char buf[4];
-    unsigned short int data;
+    UINT8 buf[4];
+    UINT16 data;
 
     while((UART_REG(LSR,pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID)
     {
 
-        data = (unsigned short)UART_REG(RBR,pdevFd) ;
+        data = (UINT16)UART_REG(RBR,pdevFd) ;
         buf[0] = (data >> 0) & 0xff;
 
         if(uartRecvBytes(pdevFd,(char*)&buf[0],sizeof(buf[0])) != 0)
@@ -437,6 +437,8 @@ void uartRecvHandle(UART_BUFF * pDev)
 int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
 {
     int index = 0;
+    UINT32 count = 0;
+    UINT32 maxCount = 5000;
     char * ptr = pBuf;
     UINT8 data;
 
@@ -448,12 +450,17 @@ int uartTransBytes(UART_BUFF *  pdevFd, char *pBuf, int nBytes)
     for(index = 0;index < nBytes;index++)
     {
         while((UART_REG(LSR,pdevFd) & LSR_TRANS_FIFO_EMTPY) != LSR_TRANS_FIFO_EMTPY)
-        {
+        {	       	
             PlatformDelay(1);
+            ++count;
+            if( count > maxCount ) {
+            	PRINTF("timeout to write\n");
+            	return nBytes;
+            }
         }
 
         data = (UINT8)(*ptr);
-        PRINTF("sent: %x\n", data);
+        // PRINTF("sent: %x\n", data);
         UART_REG(THR,pdevFd) = data;
         ptr++;
     }
