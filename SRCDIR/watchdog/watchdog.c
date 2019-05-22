@@ -8,6 +8,7 @@
 
 #pragma DATA_SECTION   (g_wdog_counter,  "shell_lib");
 static UINT16 g_wdog_counter = 0;
+static UINT8 g_kick_dog = 1;
 
 void WatchdogInit(void)
 {
@@ -17,6 +18,7 @@ void WatchdogInit(void)
 	GpioMuxRegs.GPBDIR.bit.GPIOB9 = GPIO_DIR_OUTPUT;
 	GpioMuxRegs.GPBDIR.bit.GPIOB10 = GPIO_DIR_OUTPUT;
 	EDIS;
+	g_kick_dog = 1;
 }
 
 void WatchdogEnable(void)
@@ -31,17 +33,23 @@ void WatchdogDisable(void)
 
 void WatchdogKick(void)
 {
-	++g_wdog_counter;
-	if( (g_wdog_counter % 2) == 0 ) {
-		GpioDataRegs.GPBCLEAR.bit.GPIOB10 = 1;
-	} else {
-		GpioDataRegs.GPBSET.bit.GPIOB10 = 1;
+	if( g_kick_dog ) {
+		++g_wdog_counter;
+		if( (g_wdog_counter % 2) == 0 ) {
+			GpioDataRegs.GPBCLEAR.bit.GPIOB10 = 1;
+		} else {
+			GpioDataRegs.GPBSET.bit.GPIOB10 = 1;
+		}
 	}
 }
 
 void WatchdogShow(void)
 {
 	shellprintf("counter=0x%x\n", g_wdog_counter);
+}
+
+void WatchdogReset(void) {
+	g_kick_dog = 0;
 }
 
 void WatchdogTask(void)

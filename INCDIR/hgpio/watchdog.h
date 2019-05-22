@@ -8,5 +8,6 @@ extern void WatchdogKick(void);
 extern void WatchdogTask(void);
 extern int WatchdogCmdInit(void);
 extern void WatchdogShow(void);
+extern void WatchdogReset(void);
 
 #endif

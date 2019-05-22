@@ -60,6 +60,11 @@ INT32 do_watchdog ( cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, INT8 *const argv[]
 		return 0;
 	}
 
+	if( strcmp(ops, "reboot") == 0 ) {
+		WatchdogReset();
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -74,6 +79,7 @@ far cmd_tbl_t g_wdog_cmd[] =
 		"wdog disable\n"
 		"wdog kick\n"
 		"wdog show\n"
+		"wdog reboot\n"
 	},
 };
 
