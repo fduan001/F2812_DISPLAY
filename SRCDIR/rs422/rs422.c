@@ -6,7 +6,7 @@
 #include "rs422.h"
 #include "fpga.h"
 
-#if 1
+#if 0
 #define RS422_USR_INTR_MODE   1
 #endif
 
@@ -331,9 +331,15 @@ INT32 RS422Init(UINT8 chipNo)
 
     uartReset(chipNo);    
 
+#ifdef RS422_USR_INTR_MODE
     UART_REG(FCR,pdevFd) = FCR_RECV_CLR | FCR_TRANS_CLR | FCR_RECV_TIG1 | 0x01;
     PlatformDelay(1);
     UART_REG(FCR,pdevFd) = FCR_RECV_TIG1 | 0x01;
+#else
+    UART_REG(FCR,pdevFd) = FCR_RECV_CLR | FCR_TRANS_CLR | FCR_RECV_TIG14 | 0x01;
+    PlatformDelay(1);
+    UART_REG(FCR,pdevFd) = FCR_RECV_TIG14 | 0x01;
+#endif
 
     return ret;
 }
@@ -480,9 +486,11 @@ INT32 uartPollRead(UART_BUFF * pDev, INT8 *pBuf, INT32 nBytes) {
 			if((UART_REG(LSR, pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID) {
 				data = (UINT16)UART_REG(RBR, pdevFd);
 				pBuf[i] = (data >> 0) & 0xff;
+				break;
 			} else {
 				++count;
 				if( count > maxCount ) {
+					PRINTF("Timeout to read, read %ld bytes\n", i);
 					return i;
 				}
 				PlatformDelay(1); /* delay 1us then check */

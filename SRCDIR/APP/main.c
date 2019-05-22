@@ -162,7 +162,7 @@ extern 	void RS422SysDataInit(void);
 /*
  *  ======== main ========
  */
-Void main()
+void main()
 { 
      // System_printf("hello world\n");
 

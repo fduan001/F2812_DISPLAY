@@ -117,9 +117,9 @@ static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 
 static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * const argv[])
 {
-	int rc = 0;
+	UINT32 rc = 0;
 	int chip;
-	unsigned int bytes;
+	UINT32 bytes;
 	UINT8  magic[10];
 
 	magic[0] = 0x7e;
@@ -133,7 +133,7 @@ static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * co
 	magic[8] = 0x02;
 	magic[9] = 0x7f;
 
-	chip = simple_strtoul(argv[1], NULL, 10);
+	chip = simple_strtoul(argv[1], NULL, 8);
 
 	if( chip == 0 ) {
 		rc = HostUartSend(magic, sizeof(magic));
@@ -147,7 +147,7 @@ static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * co
 		return CMD_RET_FAILURE;
 	}
 
-	PRINTF("rs422 %u WRITE COMPLETE\n", chip);
+	PRINTF("rs422 %u WRITE %lu bytes COMPLETE\n", chip, rc);
 	return CMD_RET_SUCCESS;
 }
 
