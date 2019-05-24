@@ -49,7 +49,7 @@ static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * con
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Open(chip, 'e', 1, 8, 19200);
+		rc = RS422Open(0, 'e', 1, 8, 19200);
 		if( rc != 0 ) {
 			PRINTF("RS422Open failed, rc=%d\n", rc);
 			return CMD_RET_FAILURE;
@@ -70,7 +70,7 @@ static INT32 do_rs422_show(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 		PRINTF("chip %u is invalid\n", chip);
 		return CMD_RET_FAILURE;
 	}
-	DebugUartRegInfo(chip);
+	DebugUartRegInfo(0);
 
 	return CMD_RET_SUCCESS;
 }
@@ -96,7 +96,7 @@ static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Read(chip, buff, bytes);
+		rc = RS422Read(0, buff, bytes);
 	}
 
 	if( rc != bytes ) {
@@ -140,7 +140,7 @@ static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * co
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Write(chip, magic, sizeof(magic));
+		rc = RS422Write(0, magic, sizeof(magic));
 	}
 	if( rc != sizeof(magic) ) {
 		PRINTF("RS422Write failed\n");
@@ -169,7 +169,7 @@ static INT32 do_rs422_test(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 	}
 #endif
 
-	rc = RS422Open(1, 'e', 1, 8, 19200);
+	rc = RS422Open(0, 'e', 1, 8, 19200);
 	if( rc != 0 ) {
 		PRINTF("RS422Open failed, rc=%d\n", rc);
 		return CMD_RET_FAILURE;
@@ -199,7 +199,7 @@ static INT32 do_rs422_test(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 	    	 memset(cbuf,0,sizeof(cbuf));
 	    	 if(activeNo == 1)
 	    	 {
-		    	 if(RS422Read(1, (char*)cbuf, UT_LEN) == UT_LEN)
+		    	 if(RS422Read(0, (char*)cbuf, UT_LEN) == UT_LEN)
 		    	 {
 		    		 PRINTF("----Chip2 Recv RS422 Frame -----\r\n");
 
@@ -209,7 +209,7 @@ static INT32 do_rs422_test(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 		    	    	 cbuf[i]++;
 		    	     }
 		    	     
-		    	     RS422Write(1, (char*)cbuf, UT_LEN);
+		    	     RS422Write(0, (char*)cbuf, UT_LEN);
 		    	     PRINTF("----Send RS422 Frame on chip2-----\r\n");
 		    	     activeNo = 0;
 		     		 
