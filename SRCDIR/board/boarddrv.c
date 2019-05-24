@@ -58,6 +58,9 @@ void InitXint(void)
 	*(volatile UINT16*)XINT2_REG = 0x1;
 }
 
+void InitSciBInt(void) {
+
+}
 
 void BoardInit()
 {

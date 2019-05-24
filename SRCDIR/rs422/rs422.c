@@ -40,11 +40,13 @@ typedef struct{
 
     BOOL isOpen;
 
+#ifdef RS422_USR_INTR_MODE
     UINT8 RXBuffer[RX_LEN]; // [# of buffers][RX_LEN bytes]
     UINT32  msgrd,msgwr;
 
     HANDLE   rx_semSync;
-
+#endif
+    
     UINT32 baseAddr;
     UINT8 reset_bit;
     UINT8 int_bit;
@@ -85,6 +87,8 @@ INT32 uartTransBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes);
 #ifdef RS422_USR_INTR_MODE
 void uartRecvHandle(UART_BUFF * pDev);
 INT32 uartRecvBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes);
+#else
+INT32 uartPollRead(UART_BUFF * pDev, INT8 *pBuf, INT32 nBytes);
 #endif
 
 void DebugSysReg(void)
@@ -407,7 +411,7 @@ INT32 RS422SetBaud(UINT8 chipNo,UINT32 baud)
     return ret;
 }
 
-
+#ifdef RS422_USR_INTR_MODE
 INT32 uartRecvBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes)
 {
     int index = 0;
@@ -452,7 +456,6 @@ INT32 uartRecvBytes(UART_BUFF *  pdevFd, INT8 *pBuf, INT32 nBytes)
     return index;
 }
 
-#ifdef RS422_USR_INTR_MODE
 void uartRecvHandle(UART_BUFF * pDev)
 {
     UART_BUFF *pdevFd = (UART_BUFF *)pDev;
