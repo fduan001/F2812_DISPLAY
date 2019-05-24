@@ -31,6 +31,7 @@ HANDLE  rxSemSync;
 #ifdef RS422_USR_INTR_MODE
 void HostUartIsr(void)
 {
+	Osal_DisableIsr(HOST_RX_INT_NUM);
 	while(ScibRx_Ready()) {
 		if( ((msgwr + 1) % RX_LEN) != msgrd ) {
 			rxBuffer[msgwr] = (UINT8)(ScibRegs.SCIRXBUF.all);
@@ -40,6 +41,7 @@ void HostUartIsr(void)
 	Osal_SemPost(rxSemSync);
 	ScibRegs.SCIFFRX.bit.RXOVF_CLR=1;   // Clear Overflow flag
 	ScibRegs.SCIFFRX.bit.RXFFINTCLR=1;   // Clear Interrupt flag
+	Osal_EnableIsr(HOST_RX_INT_NUM);
     return;
 }
 #endif
@@ -57,10 +59,8 @@ INT32 HostUartInit(void) {
 		return 1;
 	}
 
-	EALLOW;
-	PieVectTable.RXBINT = &HostUartIsr;
-	EDIS;
-	IER |= M_INT9; // enable interrupt
+	Osal_InstallPIEIsr(HostUartIsr, HOST_RX_INT_NUM);
+	Osal_EnableIsr(HOST_RX_INT_NUM);
 	isOpen = 1;
 #endif
 	return 0;
