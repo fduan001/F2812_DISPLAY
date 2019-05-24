@@ -243,6 +243,7 @@ static INT32 do_rs422_test(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 	return CMD_RET_SUCCESS;
 }
 
+#pragma DATA_SECTION   (cmd_rs422_sub,"shell_lib");
 static cmd_tbl_t cmd_rs422_sub[] = {
 	{"init", 8, 1, do_rs422_init, "", ""},
 	{"show", 2, 1, do_rs422_show, "", ""},

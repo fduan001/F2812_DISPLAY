@@ -4,6 +4,7 @@
 #include "util.h"
 #include "platform_os.h"
 #include "DSP28_Device.h"
+#include "boardcfg.h"
 
 #define RS422_USR_INTR_MODE 1
 
@@ -20,7 +21,11 @@ typedef int BOOL;
 
 #define RX_LEN   256
 
-BOOL    isOpen;
+#pragma DATA_SECTION   (rxBuffer,"shell_lib");
+#pragma DATA_SECTION   (msgrd,"shell_lib");
+#pragma DATA_SECTION   (msgwr,"shell_lib");
+#pragma DATA_SECTION   (rxSemSync,"shell_lib");
+
 UINT8   rxBuffer[RX_LEN];
 UINT32  msgrd,msgwr;
 HANDLE  rxSemSync;  
@@ -47,9 +52,34 @@ void HostUartIsr(void)
 #endif
 
 INT32 HostUartInit(void) {
+    //SCI B 
+    ScibRegs.SCIFFTX.all=0x8000;
 
+     ScibRegs.SCICTL1.all = 0x0;
+    /*   8 bit data */
+    ScibRegs.SCICCR.all = SCICCR_CFG;
+
+    ScibRegs.SCICTL1.all = SCICTL1_CFG;
+    ScibRegs.SCICTL2.all = SCICTL2_REG;
+
+    ScibRegs.SCIHBAUD = (SCI_BAUD >> 8) & 0xff;
+    ScibRegs.SCILBAUD = (SCI_BAUD) & 0xFF;
+
+    ScibRegs.SCIFFTX.all=0xC028;
 #ifdef RS422_USR_INTR_MODE
-	isOpen = 0;
+    ScibRegs.SCIFFRX.all=0x0021;
+#else
+    ScibRegs.SCIFFRX.all=0x0028;
+#endif
+
+	ScibRegs.SCIFFCT.all=0x00;
+
+    /* enable SCI*/
+    ScibRegs.SCICTL1.all = (SCICTL1_CFG | 0x20);
+    ScibRegs.SCIFFTX.bit.TXFIFOXRESET=1;
+    ScibRegs.SCIFFRX.bit.RXFIFORESET=1;
+    
+#ifdef RS422_USR_INTR_MODE
 	memset(rxBuffer, 0, sizeof(rxBuffer));
 	msgwr = 0;
 	msgrd=0;
@@ -61,8 +91,8 @@ INT32 HostUartInit(void) {
 
 	Osal_InstallPIEIsr(HostUartIsr, HOST_RX_INT_NUM);
 	Osal_EnableIsr(HOST_RX_INT_NUM);
-	isOpen = 1;
 #endif
+
 	return 0;
 }
 
