@@ -6,7 +6,7 @@
 #include "rs422.h"
 #include "fpga.h"
 
-#if 0
+#if 1
 #define RS422_USR_INTR_MODE   1
 #endif
 
@@ -213,6 +213,7 @@ INT32 RS422Open(UINT8 chipNo, INT8 party, UINT8 stop, UINT8 data_bit, UINT32 bau
 INT32 RS422Close(UINT8 chipNo)
 {
     INT32 ret = OK;
+    UINT8 irq_num = 0;
 
     UART_CTX_T *pdevFd = (UART_CTX_T *)&(gUartCtx[chipNo]);
 
@@ -232,6 +233,7 @@ INT32 RS422Close(UINT8 chipNo)
         pdevFd->rxSemSync  = NULL;
     }     
 
+    irq_num = gUartIntrBit[chipNo];
     FPGA_REG16_W(FPGA_XINT1_MASK_REG, (FPGA_REG16_R(FPGA_XINT1_MASK_REG) | (0x01 << irq_num)));
 #endif
 
