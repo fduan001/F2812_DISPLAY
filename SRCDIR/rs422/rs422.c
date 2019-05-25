@@ -33,7 +33,7 @@ typedef int BOOL;
 #define   RS422_BASE_ADDR    (0x80000 + 0x70)
 
 #define UART_REG(reg, pchan) \
-(*(volatile unsigned short *)(((UINT32)(pchan->baseAddr)) + (reg)))
+(*(volatile UINT16*)(((UINT32)(pchan->baseAddr)) + (reg)))
 
 
 typedef struct{
