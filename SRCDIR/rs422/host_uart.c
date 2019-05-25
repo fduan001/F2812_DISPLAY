@@ -6,7 +6,9 @@
 #include "DSP28_Device.h"
 #include "boardcfg.h"
 
+#if 0
 #define RS422_USR_INTR_MODE 1
+#endif
 
 #ifdef RS422_USR_INTR_MODE
 typedef int BOOL;
@@ -36,6 +38,7 @@ HANDLE  rxSemSync;
 #ifdef RS422_USR_INTR_MODE
 void HostUartIsr(void)
 {
+	PRINTF("RX FIFO interrupt\n");
 	Osal_DisableIsr(HOST_RX_INT_NUM);
 	while(ScibRx_Ready()) {
 		if( ((msgwr + 1) % RX_LEN) != msgrd ) {

@@ -6,7 +6,7 @@
 #include "rs422.h"
 #include "fpga.h"
 
-#if 1
+#if 0
 #define RS422_USR_INTR_MODE   1
 #endif
 
