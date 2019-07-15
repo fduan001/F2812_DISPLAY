@@ -70,7 +70,7 @@ typedef struct isr_info_t {
 
 static isr_info_t g_isr_info[MAX_IRQ_NUM];
 
-int RegisterIsr(UINT8 bit_pos, ISR_HANDLER isr) {
+INT32 RegisterIsr(UINT8 bit_pos, ISR_HANDLER isr) {
     if(bit_pos >= MAX_IRQ_NUM) {
         return 1;
     }

@@ -49,7 +49,7 @@ static INT32 do_rs422_init(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * con
 	}
 
 	if( chip == 1 ) {
-		rc = RS422Open(0, 'e', 1, 8, 19200);
+		rc = RS422Open(0, 'e', 1, 8, 9600);
 		if( rc != 0 ) {
 			PRINTF("RS422Open failed, rc=%d\n", rc);
 			return CMD_RET_FAILURE;
