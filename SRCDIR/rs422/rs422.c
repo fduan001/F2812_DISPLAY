@@ -455,7 +455,7 @@ INT32 uartPollRead(UART_CTX_T * pDev, INT8 *pBuf, INT32 nBytes) {
 		while(1) {
 			if((UART_REG(LSR, pdevFd) & LSR_RECV_VALID) == LSR_RECV_VALID) {
 				data = (UINT16)UART_REG(RBR, pdevFd);
-				pBuf[i] = (data >> 0) & 0xff;
+				pBuf[i] = (UINT8)((data >> 0) & 0xff);
 				break;
 			} else {
 				++count;

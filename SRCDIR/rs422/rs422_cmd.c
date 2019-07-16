@@ -115,6 +115,116 @@ static INT32 do_rs422_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * cons
 	return CMD_RET_SUCCESS;
 }
 
+static INT32 do_rs422_loop_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * const argv[])
+{
+	int rc = 0;
+	int chip;
+	unsigned int bytes;
+	int remain = 0;
+	char buff[100];
+	char *cur_ptr = buff;
+	int i = 0;
+
+	chip = simple_strtoul(argv[1], NULL, 10);
+	bytes = simple_strtoul(argv[2], NULL, 10);
+
+	if( chip == 0 ) {
+		rc = HostUartRecv(buff, bytes);
+	}
+
+	if( chip == 1 ) {
+		rc =  0;
+		remain = bytes;
+		while(1) {
+			rc += RS422Read(0, cur_ptr, remain - rc);
+			cur_ptr += rc;
+			if( rc >= bytes ) {
+				break;
+			}
+		}
+	}
+
+	if( rc != bytes ) {
+		PRINTF("RS422Read failed, got %d bytes\n", rc);
+		return CMD_RET_FAILURE;
+	}
+
+	for( i = 0; i < bytes; ++i) {
+		PRINTF("0x%02x ", buff[i]);
+		if( ((i + 1) % 8) == 0 ) {
+			PRINTF("\n");
+		}
+	}
+	PRINTF("\n");
+
+	return CMD_RET_SUCCESS;
+}
+
+static char g_recv_buff[100];
+
+static INT32 do_rs422_custom_read(cmd_tbl_t *cmdtp, INT32 flag, INT32 argc, char * const argv[])
+{
+	int rc = 0;
+	int chip;
+	int bytes = 47;
+	int remain = 0;
+
+	char *cur_ptr = g_recv_buff;
+	int i = 0;
+	INT32 maxLoop = 0;
+	INT32 index = 0;
+
+	chip = simple_strtoul(argv[1], NULL, 10);
+	maxLoop = simple_strtoul(argv[2], NULL, 10);
+
+	if( chip == 0 ) {
+		rc = HostUartRecv(g_recv_buff, bytes);
+	}
+
+	memset(g_recv_buff, 0, sizeof(g_recv_buff));
+	if( chip == 1 ) {
+		for( index = 0; index < maxLoop; ++index ) {
+			rc =  0;
+			remain = bytes;
+			cur_ptr = g_recv_buff;
+
+			rc += RS422Read(0, cur_ptr, 1);
+			if( cur_ptr[0] == 0xaa ) {
+				PRINTF("cur_ptr=%p 0x%02x\n", cur_ptr, cur_ptr[0]);
+				rc += RS422Read(0, cur_ptr + rc, 1);
+				if( cur_ptr[1] == 0x55 ) {
+					/* detect frame start, read next 45 bytes */
+					PRINTF("cur_ptr=%p 0x%02x\n", cur_ptr, cur_ptr[1]);
+					remain = bytes - rc;
+					cur_ptr += rc;
+					rc  = 0;
+					while(1) {
+						PRINTF("cur_ptr=%p 0x%02x\n", cur_ptr, cur_ptr[rc]);
+						rc += RS422Read(0, cur_ptr, remain - rc);
+						cur_ptr += rc;
+						if( rc >= remain ) {
+							break;
+						}
+					}
+					PRINTF("loop=%ld\n", index);
+					PRINTF("cur_ptr=%p 0x%02x\n", cur_ptr, cur_ptr[rc]);
+					for( i = 0; i < bytes; ++i) {
+						PRINTF("0x%02x ", cur_ptr[i]);
+						if( ((i + 1) % 8) == 0 ) {
+							PRINTF("\n");
+						}
+					}
+					PRINTF("\n");
+				} else {
+					continue;
+				}
+			}
+		} // end for
+	} // end if
+
+	return CMD_RET_SUCCESS;
+}
+
 static INT32 do_rs422_write(cmd_tbl_t *cmdtp, INT32 flag,  INT32 argc, char * const argv[])
 {
 	UINT32 rc = 0;
@@ -248,6 +358,8 @@ static cmd_tbl_t cmd_rs422_sub[] = {
 	{"init", 8, 1, do_rs422_init, "", ""},
 	{"show", 2, 1, do_rs422_show, "", ""},
 	{"read", 6, 1, do_rs422_read, "", ""},
+	{"lread", 6, 1, do_rs422_loop_read, "", ""},
+	{"cread", 6, 1, do_rs422_custom_read, "", ""},
 	{"write", 6, 1, do_rs422_write, "", ""},
 	{"test", 1, 1, do_rs422_test, "", ""},
 };
